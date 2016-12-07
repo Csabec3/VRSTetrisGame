@@ -33,7 +33,7 @@
 #include "stm32l1xx.h"
 
 // Low-level LCD driving functions --------------------------------------------------------------------------
-
+// edit
 // Reset the LCD hardware
 void lcdReset(void)
 {
