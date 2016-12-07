@@ -32,8 +32,9 @@
 #include "ssd1306.h"
 #include "stm32l1xx.h"
 
+uint16_t matrix_pom[128][128];
 // Low-level LCD driving functions --------------------------------------------------------------------------
-// edit
+
 // Reset the LCD hardware
 void lcdReset(void)
 {
@@ -314,10 +315,62 @@ void matrixPlot(uint16_t matrix[128][128]){
 
 }
 
-void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height){
-	for(int i=0;i<length;i++)
+void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru){
+	/*for(int i=0;i<length;i++)
 		for(int j=0;j<height;j++)
-			matrix[x0+i][y0+j]=1;
+			matrix[x0+i][y0+j]=1;*/
+
+
+	if ((cisloTvaru==0) || (cisloTvaru==1)){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				matrix[x0+i][y0+j]=1;
+	}
+	else if (cisloTvaru==2){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i<6 && j>5) || (i>11 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=1;
+	}
+	else if (cisloTvaru==3){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i>11 && j<6) || (i<6 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=1;
+	}
+	else if (cisloTvaru==4){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i<6 && j<6) || (i>11 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=1;
+	}
+	else if (cisloTvaru==5){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if(i>5 && j<12 ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=1;
+	}
+	else if (cisloTvaru==6){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if(i<6 && j<12 ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=1;
+	}
 }
 
 void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height){
@@ -327,16 +380,79 @@ void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, 
 				matrix[x0+i][y0+j]=0;
 }
 
-void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height){
-	for(int i=0;i<length;i++)
+void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru){
+	/*for(int i=0;i<length;i++)
 		for(int j=0;j<height;j++)
-			matrix[x0+i][y0+j]=3;
+			matrix[x0+i][y0+j]=3;*/
+
+	if ((cisloTvaru==0) || (cisloTvaru==1)){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				matrix[x0+i][y0+j]=3;
+	}
+	else if (cisloTvaru==2){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i<6 && j>5) || (i>11 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=3;
+	}
+	else if (cisloTvaru==3){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i>11 && j<6) || (i<6 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=3;
+	}
+	else if (cisloTvaru==4){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if((i<6 && j<6) || (i>11 && j>5) ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=3;
+	}
+	else if (cisloTvaru==5){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if(i>5 && j<12 ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=3;
+	}
+	else if (cisloTvaru==6){
+		for(int i=0;i<length;i++)
+			for(int j=0;j<height;j++)
+				if(i<6 && j<12 ){
+					matrix[x0+i][y0+j]=0;
+				}
+				else
+				matrix[x0+i][y0+j]=3;
+	}
 }
+
+/*
+// otacanie objektov o 90 stupnov
+void rotation(uint16_t matrix_pom[128][128], int16_t x0, int16_t y0, int length, int heigth){
+	for(int i=0; i<heigth; i++) {
+	    for(int j=0; j<length; j++) {
+	    	matrix[i][j] = matrix_pom[heigth-1-j][i];
+	    }
+	}
+	//return matrix[i][j];
+}*/
 
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length){
 	int temp = 0;
 	for(int i=0;i<length;i++)
-		if (matrix[x0+i][y0]==3 || matrix[x0+i][y0]==2)
+		if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 )
+
 			temp=1;
 	return temp;
 }
