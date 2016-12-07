@@ -149,9 +149,11 @@ void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16
 void startupNVIC();
 void adc_init(void);
 
-void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height);
+void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
 void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height);
-void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height);
+void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
+// otacanie
+void rotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int heigth);
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length);
 int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height);
 int checkLineFilled(uint16_t matrix[128][128]);
