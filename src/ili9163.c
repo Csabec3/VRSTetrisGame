@@ -329,10 +329,10 @@ void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, 
 	else if (cisloTvaru==2){
 		for(int i=0;i<length;i++)
 			for(int j=0;j<height;j++)
-				if((i<6 && j>5) || (i>11 && j>5) ){
-					matrix[x0+i][y0+j]=0;
+				if(j<6){
+					matrix[x0+i][y0+j]=1;
 				}
-				else
+				else if (j>5 && (i>5 && i<12))
 				matrix[x0+i][y0+j]=1;
 	}
 	else if (cisloTvaru==3){
@@ -448,14 +448,26 @@ void rotation(uint16_t matrix_pom[128][128], int16_t x0, int16_t y0, int length,
 	//return matrix[i][j];
 }*/
 
-int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length){
+int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int cisloTvaru){
 	int temp = 0;
+	if(cisloTvaru == 0 || cisloTvaru == 1 || cisloTvaru == 3 || cisloTvaru == 4 || cisloTvaru == 5 || cisloTvaru == 6 ){
 	for(int i=0;i<length;i++)
-		if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 )
+			if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 ){
+				temp=1;
+			}
+	}
 
-			temp=1;
-	return temp;
-}
+	if(cisloTvaru == 2 ){
+		for(int i=5;i <= 8;i++)
+			if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 ){
+				temp=1;
+			}}
+
+	//else if (j>5 && (i>5 && i<12))
+	//				matrix[x0+i][y0+j]=1;
+
+		return temp;
+	}
 
 int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height){
 	int temp = 0;
