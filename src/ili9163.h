@@ -154,11 +154,14 @@ void createFrame(uint16_t matrix[128][128]);
 void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int rotateObject(int cisloTvaru);
+int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+
+
 
 void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
 // otacanie
 void rotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int heigth);
-int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length,int cisloTvaru);
+
 int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height);
 int checkLineFilled(uint16_t matrix[128][128]);
 int checkGameOver(uint16_t matrix[128][128]);

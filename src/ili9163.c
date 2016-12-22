@@ -479,9 +479,9 @@ void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTva
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
 					if (i<6)
-						matrix[x0+i][y0+j]=1;
+						matrix[x0+i][y0-j]=1;
 					if ((j>5 && j<12) && (i>5))
-						matrix[x0+i][y0+j]=1;
+						matrix[x0+i][y0-j]=1;
 				}
 			}
 	}
@@ -741,7 +741,7 @@ void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTva
 				}
 			}
 	}
-	// ak objekt je _.
+	// ak objekt je ._
 	else if (cisloTvaru == 18){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
@@ -753,6 +753,107 @@ void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTva
 				}
 			}
 	}
+}
+
+int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
+	int temp = 0;
+
+	// ak objekt je stvorec
+	if (cisloTvaru == 0){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je |
+	else if (cisloTvaru == 1){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je stvorec _
+	else if (cisloTvaru == 2){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3 || matrix[x0+18][y0+1]==2 || matrix[x0+18][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je Z
+	else if (cisloTvaru == 3){
+		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je N
+	else if (cisloTvaru == 4){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3)
+			temp = 1;
+	}
+	// ak objekt je opacny Z
+	else if (cisloTvaru == 5){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
+			temp = 1;
+	}
+	// ak objekt je opacny N
+	else if (cisloTvaru == 6){
+		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je L
+	else if (cisloTvaru == 7){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je _.
+	else if (cisloTvaru == 8){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je '|
+	else if (cisloTvaru == 9){
+		if (matrix[x0][y0-11]==2 || matrix[x0][y0-11]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je ,..
+	else if (cisloTvaru == 10){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
+			temp = 1;
+	}
+	// ak objekt je .|.
+	else if (cisloTvaru == 11){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je -|
+	else if (cisloTvaru == 12){
+		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je .,.
+	else if (cisloTvaru == 13){
+		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
+			temp = 1;
+	}
+	// ak objekt je |-
+	else if (cisloTvaru == 14){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3)
+			temp = 1;
+	}
+	// ak objekt je opacny L
+	else if (cisloTvaru == 15){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je ..,
+	else if (cisloTvaru == 16){
+		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
+			temp = 1;
+	}
+	// ak objekt je |'
+	else if (cisloTvaru == 17){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-11]==2 || matrix[x0+6][y0-11]==3)
+			temp = 1;
+	}
+	// ak objekt je ._
+	else if (cisloTvaru == 18){
+		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
+			temp = 1;
+	}
+	return temp;
 }
 
 void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru){
@@ -812,37 +913,7 @@ void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length
 	}
 }
 
-/*
-// otacanie objektov o 90 stupnov
-void rotation(uint16_t matrix_pom[128][128], int16_t x0, int16_t y0, int length, int heigth){
-	for(int i=0; i<heigth; i++) {
-	    for(int j=0; j<length; j++) {
-	    	matrix[i][j] = matrix_pom[heigth-1-j][i];
-	    }
-	}
-	//return matrix[i][j];
-}*/
 
-int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int cisloTvaru){
-	int temp = 0;
-	if(cisloTvaru == 0 || cisloTvaru == 1 || cisloTvaru == 3 || cisloTvaru == 4 || cisloTvaru == 5 || cisloTvaru == 6 ){
-	for(int i=0;i<length;i++)
-			if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 ){
-				temp=1;
-			}
-	}
-
-	if(cisloTvaru == 2 ){
-		for(int i=5;i <= 8;i++)
-			if (matrix[x0+i][y0]==3  || matrix[x0+i][y0]==2 ){
-				temp=1;
-			}}
-
-	//else if (j>5 && (i>5 && i<12))
-	//				matrix[x0+i][y0+j]=1;
-
-		return temp;
-	}
 
 int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height){
 	int temp = 0;

@@ -644,8 +644,8 @@ int main(void)
 	createText();   	// vypis textov
 
   	// Parametre objektu
-  	uint8_t ballX[1000]; 		// X-ova pozicia
-  	uint8_t ballY[1000]; 		// Y-ova pozicia
+  	uint8_t blockX[1000]; 		// X-ova pozicia
+  	uint8_t blockY[1000]; 		// Y-ova pozicia
   	uint8_t xDir[1000];  		// velkost kroku na X-ovej osi
   	uint8_t yDir[1000];			// velkost kroku na Y-ovej osi
   	char c[4];					// cislo objektu
@@ -659,8 +659,8 @@ int main(void)
 
   	//vytvorenie objektov
   	for (count = 0; count < 1000; count++){
-		ballX[count] = 87; 	// zaciatocna X-ova pozicia objektu
-		ballY[count] = 1; 	// zaciatocna Y-ova pozicia objektu
+		blockX[count] = 87; 	// zaciatocna X-ova pozicia objektu
+		blockY[count] = 0; 	// zaciatocna Y-ova pozicia objektu
 		xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
 		yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
   	}
@@ -677,7 +677,7 @@ int main(void)
 	  // v kazdom kroku aktualizuje maticu
 	  matrixPlot(matrix);
 	  // vymaze dany objekt
-	  deleteBlock(matrix, ballX[count], ballY[count], cisloTvaru);
+	  deleteBlock(matrix, blockX[count], blockY[count], cisloTvaru);
 
 	  // prehodi cislo na string
 	 // sprintf(c, "%d", count+1);
@@ -686,66 +686,67 @@ int main(void)
 	 // lcdPutS(c, lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 	  // v kazdom kroku posuva objekt smerom dole
-	  ballY[count] += yDir[count];
+	  blockY[count] += yDir[count];
 
 	  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
-	  /*if ((AD_value>1700) && (AD_value<2300)){
-		  ballX[count] -= xDir[count]; // dolava
+	  if ((AD_value>1700) && (AD_value<2300)){
+		  blockX[count] -= xDir[count]; // dolava
 	  }
 	  if ((AD_value>2500) && (AD_value<3100)){
-		  ballX[count] += xDir[count]; // doprava
-	  }*/
+		  blockX[count] += xDir[count]; // doprava
+	  }
 
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-	  /*if (ballX[count]-1 < 57 || checkNextToBlock(matrix, ballX[count]-1,ballY[count], height)){ // lava strana
+	  /*if (blockX[count]-1 < 57 || checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){ // lava strana
 		  xDir[count] = 0;
 		  if ((AD_value>2500) && (AD_value<3200)){
 			  xDir[count] = 12;
 		  }
 	  }*/
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-	  /*if (ballX[count]+length > 116 || checkNextToBlock(matrix, ballX[count]+length,ballY[count], height)){ // prava strana
+	  /*if (blockX[count]+length > 116 || checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){ // prava strana
 		  xDir[count] = 0;
 		  if ((AD_value>1700) && (AD_value<2300)){
 			  xDir[count] = 6;
 		  }
 	  }*/
 	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na lavej strane a objektom na pravej strane
-	  /*if (ballX[count]-1 < 57 && checkNextToBlock(matrix, ballX[count]+length,ballY[count], height)){
+	  /*if (blockX[count]-1 < 57 && checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){
 		  xDir[count] = 0;
 	  }
 	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na pravej strane a objektom na lavej strane
-	  if (ballX[count]+length > 116 && checkNextToBlock(matrix, ballX[count]-1,ballY[count], height)){
+	  if (blockX[count]+length > 116 && checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){
 		  xDir[count] = 0;
 	  }
 	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na pravej strane a ramcom na lavej strane
-	  if (checkNextToBlock(matrix, ballX[count]+length,ballY[count], height) && checkNextToBlock(matrix, ballX[count]-1,ballY[count], height)){
+	  if (checkNextToBlock(matrix, blockX[count]+length,blockY[count], height) && checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){
 		  xDir[count] = 0;
 	  }*/
 
 	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
 	  /*if ((AD_value>3300) && (AD_value<3600)){
-		  if (checkBlockade(matrix, ballX[count],ballY[count]+height+6, length, cisloTvaru))
-			  ballY[count] += 0;
+		  if (checkBlockade(matrix, blockX[count],blockY[count]+height+6, length, cisloTvaru))
+			  blockY[count] += 0;
 		  else
-			  ballY[count] += 6;
+			  blockY[count] += 6;
 	  }*/
 
 
 	  // ak stlacime stvrte tlacidlo, otoci sa objekt
 	  if ((AD_value>3520) && (AD_value<3650) && cc==0){
+		  //if (checkRotation(matrix, blockX[count], blockY[count], cisloTvaru))
 		  cisloTvaru = rotateObject(cisloTvaru);
 		  cc=1;
 	  }
 
 	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-	  /*if (matrix[ballX[count]][ballY[count]+(height-6)] == 2 || checkBlockade(matrix, ballX[count],ballY[count]+(height-6), length,cisloTvaru ))
+	  if (checkBlockade(matrix, blockX[count],blockY[count]-6, cisloTvaru))
 	  {
 		  // zastavi sa objekt
 		  yDir[count] = 0;
-*/
+
 		  // necha objekt na konecnom mieste
-		  /*setBlockFixed(matrix, ballX[count], ballY[count]-6, length, height, cisloTvaru);
+		  /*setBlockFixed(matrix, blockX[count], blockY[count]-6, length, height, cisloTvaru);
 		  // GAME OVER
 		  if(checkGameOver(matrix)){
 			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
@@ -757,11 +758,13 @@ int main(void)
 		  }*/
 
 		  // vygenerujeme dalsi objekt
-		 // count++;
-		  //cisloTvaru = AD_value%19;
+		  count++;
+		  cisloTvaru = AD_value%19;
 		  //sprintf(cislo2, "%d", cisloTvaru);
 		  //lcdPutS(cislo2, lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	  //}
+	  }
+
+
 	  // checkuje naplnene riadky
 	  //score += checkLineFilled(matrix);
 	  // Vypise score
@@ -771,7 +774,10 @@ int main(void)
 
 
 	  // vykresli dany objekt
-	  createBlock(matrix, ballX[count], ballY[count], cisloTvaru);
+	  createBlock(matrix, blockX[count], blockY[count], cisloTvaru);
+
+
+
 	  cc = 0;
 
 	  //Delay(1000);
