@@ -149,8 +149,12 @@ void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16
 void startupNVIC();
 void adc_init(void);
 
-void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
-void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height);
+void createText();
+void createFrame(uint16_t matrix[128][128]);
+void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int rotateObject(int cisloTvaru);
+
 void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
 // otacanie
 void rotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int heigth);
