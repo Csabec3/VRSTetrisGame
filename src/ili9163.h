@@ -151,14 +151,12 @@ void adc_init(void);
 
 void createText();
 void createFrame(uint16_t matrix[128][128]);
-void createBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-void deleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
 int rotateObject(int cisloTvaru);
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 
 
 
-void setBlockFixed(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int height, int cisloTvaru);
 // otacanie
 void rotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int length, int heigth);
 

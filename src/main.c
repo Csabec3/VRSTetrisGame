@@ -677,7 +677,7 @@ int main(void)
 	  // v kazdom kroku aktualizuje maticu
 	  matrixPlot(matrix);
 	  // vymaze dany objekt
-	  deleteBlock(matrix, blockX[count], blockY[count], cisloTvaru);
+	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
 
 	  // prehodi cislo na string
 	 // sprintf(c, "%d", count+1);
@@ -692,8 +692,14 @@ int main(void)
 	  if ((AD_value>1700) && (AD_value<2300)){
 		  blockX[count] -= xDir[count]; // dolava
 	  }
-	  if ((AD_value>2500) && (AD_value<3100)){
+	  else if ((AD_value>2500) && (AD_value<3100)){
 		  blockX[count] += xDir[count]; // doprava
+	  }
+	  // ak stlacime stvrte tlacidlo, otoci sa objekt
+	  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
+		  //if (checkRotation(matrix, blockX[count], blockY[count], cisloTvaru))
+		  cisloTvaru = rotateObject(cisloTvaru);
+		  cc=1;
 	  }
 
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
@@ -732,23 +738,30 @@ int main(void)
 	  }*/
 
 
-	  // ak stlacime stvrte tlacidlo, otoci sa objekt
-	  if ((AD_value>3520) && (AD_value<3650) && cc==0){
-		  //if (checkRotation(matrix, blockX[count], blockY[count], cisloTvaru))
-		  cisloTvaru = rotateObject(cisloTvaru);
-		  cc=1;
-	  }
+
 
 	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-	  if (checkBlockade(matrix, blockX[count],blockY[count]-6, cisloTvaru))
+
+
+
+	  // checkuje naplnene riadky
+	  //score += checkLineFilled(matrix);
+	  // Vypise score
+	  //sprintf(scoree, "%d", score);
+	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+
+
+	  // vykresli dany objekt
+	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
 	  {
 		  // zastavi sa objekt
 		  yDir[count] = 0;
-
 		  // necha objekt na konecnom mieste
-		  /*setBlockFixed(matrix, blockX[count], blockY[count]-6, length, height, cisloTvaru);
+		  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 3);
 		  // GAME OVER
-		  if(checkGameOver(matrix)){
+		  /*if(checkGameOver(matrix)){
 			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 			  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
@@ -763,18 +776,6 @@ int main(void)
 		  //sprintf(cislo2, "%d", cisloTvaru);
 		  //lcdPutS(cislo2, lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	  }
-
-
-	  // checkuje naplnene riadky
-	  //score += checkLineFilled(matrix);
-	  // Vypise score
-	  //sprintf(scoree, "%d", score);
-	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-
-
-	  // vykresli dany objekt
-	  createBlock(matrix, blockX[count], blockY[count], cisloTvaru);
 
 
 
