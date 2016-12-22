@@ -493,7 +493,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 				if (y0-j>1){
 					if (j<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>6)
+					if (j>5 && i>5)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -691,11 +691,10 @@ int checkLineFilled(uint16_t matrix[128][128]){
 
 int checkGameOver(uint16_t matrix[128][128]){
 	int temp = 0;
-	for(int i=0;i<2;i++){
-		for(int j=57;j<117;j++){
-			if (matrix[j][i]==3){
-				temp=1;
-			}
+	for(int i=57;i<117;i++)
+		for(int j=127;j<128;j++){
+		if (matrix[j][i]==3){
+			temp=1;
 		}
 	}
 	return temp;
@@ -721,9 +720,6 @@ void createText(){
 	lcdPutS("Level", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("1", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS("Objekt", lcdTextX(1), lcdTextY(9), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Tvar", lcdTextX(1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){

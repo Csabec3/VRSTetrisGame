@@ -648,13 +648,9 @@ int main(void)
   	uint8_t blockY[1000]; 		// Y-ova pozicia
   	uint8_t xDir[1000];  		// velkost kroku na X-ovej osi
   	uint8_t yDir[1000];			// velkost kroku na Y-ovej osi
-  	char c[4];					// cislo objektu
   	int count;					// pocitadlo objektu
   	int score = 0;				// score v tvare int
   	char scoree[8];				// score v tvare string
-  	char cislo2[8];
-  	int length = 0;				// dlzka objektu
-  	int height = 0;				// vyska objektu
   	uint16_t matrix[128][128];	// matica hry
 
   	//vytvorenie objektov
@@ -679,12 +675,6 @@ int main(void)
 	  // vymaze dany objekt
 	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
 
-	  // prehodi cislo na string
-	 // sprintf(c, "%d", count+1);
-
-	  // vypise cislo objektu
-	 // lcdPutS(c, lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
 	  // v kazdom kroku posuva objekt smerom dole
 	  blockY[count] += yDir[count];
 
@@ -700,6 +690,13 @@ int main(void)
 		  //if (checkRotation(matrix, blockX[count], blockY[count], cisloTvaru))
 		  cisloTvaru = rotateObject(cisloTvaru);
 		  cc=1;
+	  }
+	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
+	  else if ((AD_value>3400) && (AD_value<3500)){
+		  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
+			  blockY[count] += 0;
+		  else
+			  blockY[count] += 6;
 	  }
 
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
@@ -729,13 +726,11 @@ int main(void)
 		  xDir[count] = 0;
 	  }*/
 
-	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
-	  /*if ((AD_value>3300) && (AD_value<3600)){
-		  if (checkBlockade(matrix, blockX[count],blockY[count]+height+6, length, cisloTvaru))
-			  blockY[count] += 0;
-		  else
-			  blockY[count] += 6;
-	  }*/
+	  // checkuje naplnene riadky
+	  score += checkLineFilled(matrix);
+	  // Vypise score
+	  sprintf(scoree, "%d", score);
+	  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 
 
@@ -760,24 +755,16 @@ int main(void)
 		  // vygenerujeme dalsi objekt
 		  count++;
 		  cisloTvaru = AD_value%19;
-		  //sprintf(cislo2, "%d", cisloTvaru);
-		  //lcdPutS(cislo2, lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	  }
 
 
-	  // checkuje naplnene riadky
-	  //score += checkLineFilled(matrix);
-	  // Vypise score
-	  //sprintf(scoree, "%d", score);
-	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 
 
 
 	  // vykresli dany objekt
 	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
-
-
-
 
 	  cc = 0;
 
