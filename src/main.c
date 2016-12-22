@@ -660,7 +660,7 @@ int main(void)
   	//vytvorenie objektov
   	for (count = 0; count < 1000; count++){
 		ballX[count] = 87; 	// zaciatocna X-ova pozicia objektu
-		ballY[count] = ; 	// zaciatocna Y-ova pozicia objektu
+		ballY[count] = 1; 	// zaciatocna Y-ova pozicia objektu
 		xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
 		yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
   	}
