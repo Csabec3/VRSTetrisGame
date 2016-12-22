@@ -673,7 +673,7 @@ int main(void)
   while (1)
   {
 	  // v kazdom kroku aktualizuje maticu
-	  matrixPlot(matrix);
+	  matrixPlot(matrix, cisloTvaru);
 	  // vymaze dany objekt
 	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
 
@@ -733,9 +733,6 @@ int main(void)
 	  // Vypise score
 	  sprintf(scoree, "%d", score);
 	  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-
-
 
 	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
 	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))

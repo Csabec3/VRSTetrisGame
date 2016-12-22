@@ -142,7 +142,7 @@ void lcdWriteData(uint8_t dataByte1, uint8_t dataByte2);
 void lcdInitialise(uint8_t orientation);
 
 void lcdClearDisplay(uint16_t colour);
-void matrixPlot();
+void matrixPlot(uint16_t matrix[128][128], int cisloTvaru);
 void lcdPutCh(unsigned char character, uint8_t x, uint8_t y, uint16_t fgColour, uint16_t bgColour);
 void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16_t bgColour);
 

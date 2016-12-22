@@ -267,7 +267,7 @@ void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16
 	}
 }
 
-void matrixPlot(uint16_t matrix[128][128]){
+void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
 
 	uint16_t pixels[62*128];
 	uint16_t colour;
@@ -302,10 +302,23 @@ void matrixPlot(uint16_t matrix[128][128]){
 			colour = decodeRgbValue(0, 0, 0);
 		}
 		else if (pixels[x]==1){
-			colour = decodeRgbValue(31, 31, 31);
+			if (cisloTvaru == 0)
+				colour = decodeRgbValue(31, 31, 0);
+			if (cisloTvaru == 1 || cisloTvaru == 2)
+				colour = decodeRgbValue(0, 31, 31);
+			if (cisloTvaru == 3 || cisloTvaru == 4)
+				colour = decodeRgbValue(31, 0, 0);
+			if (cisloTvaru == 5 || cisloTvaru == 6)
+				colour = decodeRgbValue(0, 31, 0);
+			if (cisloTvaru == 7 || cisloTvaru == 8 || cisloTvaru == 9 || cisloTvaru == 10)
+				colour = decodeRgbValue(0, 0, 31);
+			if (cisloTvaru == 11 || cisloTvaru == 12 || cisloTvaru == 13 || cisloTvaru == 14)
+				colour = decodeRgbValue(15, 0, 31);
+			if (cisloTvaru == 15 || cisloTvaru == 16 || cisloTvaru == 17 || cisloTvaru == 18)
+				colour = decodeRgbValue(31, 15, 31);
 		}
 		else if (pixels[x]==2){
-			colour = decodeRgbValue(12, 25, 5);
+			colour = decodeRgbValue(31, 31, 31);
 		}
 		else if (pixels[x]==3){
 			colour = decodeRgbValue(31, 31, 31);
