@@ -741,19 +741,6 @@ int main(void)
 
 
 	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-
-
-
-	  // checkuje naplnene riadky
-	  //score += checkLineFilled(matrix);
-	  // Vypise score
-	  //sprintf(scoree, "%d", score);
-	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-
-
-	  // vykresli dany objekt
-	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
 	  {
 		  // zastavi sa objekt
@@ -776,6 +763,19 @@ int main(void)
 		  //sprintf(cislo2, "%d", cisloTvaru);
 		  //lcdPutS(cislo2, lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	  }
+
+
+	  // checkuje naplnene riadky
+	  //score += checkLineFilled(matrix);
+	  // Vypise score
+	  //sprintf(scoree, "%d", score);
+	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+
+
+	  // vykresli dany objekt
+	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+
 
 
 

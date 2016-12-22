@@ -342,10 +342,11 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6 && i<12)
+					if (j<6 && i>5)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>5)
+					if (j>5 && i<12)
 						matrix[x0+i][y0-j]=volba;
+
 				}
 			}
 	}
@@ -354,11 +355,11 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<6 && i>5)
+					if (j>5 && i>5)
 						matrix[x0+i][y0-j]=volba;
 					if (j>5 && j<12)
 						matrix[x0+i][y0-j]=volba;
-					if (j>11 && i<6)
+					if (j<12 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -368,9 +369,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6 && i>5)
+					if (j>5 && i>5)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i<12)
+					if (j<6 && i<12)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -380,11 +381,11 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<6 && i<6)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 					if (j>5 && j<12)
 						matrix[x0+i][y0-j]=volba;
-					if (j>11 && i>5)
+					if (j<12 && i>5)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -394,9 +395,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<12 && i<6)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>11)
+					if (j<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -406,9 +407,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6 && i>11)
+					if (j<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5)
+					if (j>5 && i>11)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -418,9 +419,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<6)
+					if (j<12 && i>5)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>5)
+					if (j>11)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -430,9 +431,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6)
+					if (j<6 && i<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i<6)
+					if (j>5)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -442,9 +443,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6 && (i>5 && i<12))
+					if (j<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5)
+					if (j>5 && (i>5 && i<12))
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -466,9 +467,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6)
+					if (j<6 && (i>5 && i<12))
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && (i>5 && i<12))
+					if (j>5)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -490,9 +491,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<12 && i>5)
+					if (j<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>11)
+					if (j>5 && i>6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -502,9 +503,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6)
+					if (j<6 && i>11)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>11)
+					if (j>5)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -514,9 +515,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
 				if (y0-j>1){
-					if (j<6)
+					if (j<12 && i<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i<6)
+					if (j>11)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -526,9 +527,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
 				if (y0-j>1){
-					if (j<6 && i<6)
+					if (j<6)
 						matrix[x0+i][y0-j]=volba;
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}

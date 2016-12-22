@@ -2130,7 +2130,7 @@ OUTPUT(VRSTetrisGame.elf elf32-littlearm)
  .debug_ranges  0x00000898       0x50 src\stm32l1xx_it.o
  .debug_ranges  0x000008e8       0x20 src\system_stm32l1xx.o
 
-.debug_line     0x00000000     0x3889
+.debug_line     0x00000000     0x388b
  .debug_line    0x00000000      0x244 Libraries\STM32L1xx_StdPeriph_Driver\src\misc.o
  .debug_line    0x00000244      0x594 Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_adc.o
  .debug_line    0x000007d8      0x35f Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_gpio.o
@@ -2140,11 +2140,11 @@ OUTPUT(VRSTetrisGame.elf elf32-littlearm)
  .debug_line    0x00001e0e      0x330 mcu\mcu.o
  .debug_line    0x0000213e      0x2c4 mcu\spi.o
  .debug_line    0x00002402      0xa07 src\ili9163.o
- .debug_line    0x00002e09      0x2b5 src\main.o
- .debug_line    0x000030be      0x34a src\ssd1306.o
- .debug_line    0x00003408       0x7c src\startup_stm32l1xx_hd.o
- .debug_line    0x00003484      0x1e9 src\stm32l1xx_it.o
- .debug_line    0x0000366d      0x21c src\system_stm32l1xx.o
+ .debug_line    0x00002e09      0x2b7 src\main.o
+ .debug_line    0x000030c0      0x34a src\ssd1306.o
+ .debug_line    0x0000340a       0x7c src\startup_stm32l1xx_hd.o
+ .debug_line    0x00003486      0x1e9 src\stm32l1xx_it.o
+ .debug_line    0x0000366f      0x21c src\system_stm32l1xx.o
 
 .debug_str      0x00000000     0x2b62
  .debug_str     0x00000000      0x3d0 Libraries\STM32L1xx_StdPeriph_Driver\src\misc.o

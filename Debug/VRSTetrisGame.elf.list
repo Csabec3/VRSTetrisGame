@@ -31,11 +31,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  13 .debug_ranges 00000908  00000000  00000000  00029150  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_line   00003889  00000000  00000000  00029a58  2**0
+ 14 .debug_line   0000388b  00000000  00000000  00029a58  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_str    00002b62  00000000  00000000  0002d2e1  2**0
+ 15 .debug_str    00002b62  00000000  00000000  0002d2e3  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .comment      0000007e  00000000  00000000  0002fe43  2**0
+ 16 .comment      0000007e  00000000  00000000  0002fe45  2**0
                   CONTENTS, READONLY
  17 .debug_frame  00002a50  00000000  00000000  0002fec4  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -3869,7 +3869,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001806:	f8d7 30a4 	ldr.w	r3, [r7, #164]	; 0xa4
  800180a:	2b0b      	cmp	r3, #11
  800180c:	ddd0      	ble.n	80017b0 <createDeleteFixBlock+0x20>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -3936,7 +3936,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001876:	f8d7 309c 	ldr.w	r3, [r7, #156]	; 0x9c
  800187a:	2b05      	cmp	r3, #5
  800187c:	ddd0      	ble.n	8001820 <createDeleteFixBlock+0x90>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4003,7 +4003,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80018e6:	f8d7 3094 	ldr.w	r3, [r7, #148]	; 0x94
  80018ea:	2b17      	cmp	r3, #23
  80018ec:	ddd0      	ble.n	8001890 <createDeleteFixBlock+0x100>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4033,13 +4033,13 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001910:	1ad3      	subs	r3, r2, r3
  8001912:	2b01      	cmp	r3, #1
  8001914:	dd33      	ble.n	800197e <createDeleteFixBlock+0x1ee>
-					if (j<6 && i<12)
+					if (j<6 && i>5)
  8001916:	f8d7 3088 	ldr.w	r3, [r7, #136]	; 0x88
  800191a:	2b05      	cmp	r3, #5
  800191c:	dc15      	bgt.n	800194a <createDeleteFixBlock+0x1ba>
  800191e:	f8d7 308c 	ldr.w	r3, [r7, #140]	; 0x8c
- 8001922:	2b0b      	cmp	r3, #11
- 8001924:	dc11      	bgt.n	800194a <createDeleteFixBlock+0x1ba>
+ 8001922:	2b05      	cmp	r3, #5
+ 8001924:	dd11      	ble.n	800194a <createDeleteFixBlock+0x1ba>
 						matrix[x0+i][y0-j]=volba;
  8001926:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  800192a:	f8d7 308c 	ldr.w	r3, [r7, #140]	; 0x8c
@@ -4053,13 +4053,13 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001940:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
  8001944:	b289      	uxth	r1, r1
  8001946:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i>5)
+					if (j>5 && i<12)
  800194a:	f8d7 3088 	ldr.w	r3, [r7, #136]	; 0x88
  800194e:	2b05      	cmp	r3, #5
  8001950:	dd15      	ble.n	800197e <createDeleteFixBlock+0x1ee>
  8001952:	f8d7 308c 	ldr.w	r3, [r7, #140]	; 0x8c
- 8001956:	2b05      	cmp	r3, #5
- 8001958:	dd11      	ble.n	800197e <createDeleteFixBlock+0x1ee>
+ 8001956:	2b0b      	cmp	r3, #11
+ 8001958:	dc11      	bgt.n	800197e <createDeleteFixBlock+0x1ee>
 						matrix[x0+i][y0-j]=volba;
  800195a:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  800195e:	f8d7 308c 	ldr.w	r3, [r7, #140]	; 0x8c
@@ -4097,14 +4097,14 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  800199a:	f8d7 308c 	ldr.w	r3, [r7, #140]	; 0x8c
  800199e:	2b11      	cmp	r3, #17
  80019a0:	ddae      	ble.n	8001900 <createDeleteFixBlock+0x170>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
 	}
 }
  80019a2:	f000 bc60 	b.w	8002266 <createDeleteFixBlock+0xad6>
-						matrix[x0+i][y0-j]=volba;
+
 				}
 			}
 	}
@@ -4127,10 +4127,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80019c4:	1ad3      	subs	r3, r2, r3
  80019c6:	2b01      	cmp	r3, #1
  80019c8:	dd4d      	ble.n	8001a66 <createDeleteFixBlock+0x2d6>
-					if (j<6 && i>5)
+					if (j>5 && i>5)
  80019ca:	f8d7 3080 	ldr.w	r3, [r7, #128]	; 0x80
  80019ce:	2b05      	cmp	r3, #5
- 80019d0:	dc15      	bgt.n	80019fe <createDeleteFixBlock+0x26e>
+ 80019d0:	dd15      	ble.n	80019fe <createDeleteFixBlock+0x26e>
  80019d2:	f8d7 3084 	ldr.w	r3, [r7, #132]	; 0x84
  80019d6:	2b05      	cmp	r3, #5
  80019d8:	dd11      	ble.n	80019fe <createDeleteFixBlock+0x26e>
@@ -4167,10 +4167,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001a28:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
  8001a2c:	b289      	uxth	r1, r1
  8001a2e:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>11 && i<6)
+					if (j<12 && i<6)
  8001a32:	f8d7 3080 	ldr.w	r3, [r7, #128]	; 0x80
  8001a36:	2b0b      	cmp	r3, #11
- 8001a38:	dd15      	ble.n	8001a66 <createDeleteFixBlock+0x2d6>
+ 8001a38:	dc15      	bgt.n	8001a66 <createDeleteFixBlock+0x2d6>
  8001a3a:	f8d7 3084 	ldr.w	r3, [r7, #132]	; 0x84
  8001a3e:	2b05      	cmp	r3, #5
  8001a40:	dc11      	bgt.n	8001a66 <createDeleteFixBlock+0x2d6>
@@ -4211,7 +4211,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001a82:	f8d7 3084 	ldr.w	r3, [r7, #132]	; 0x84
  8001a86:	2b0b      	cmp	r3, #11
  8001a88:	dd94      	ble.n	80019b4 <createDeleteFixBlock+0x224>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4241,10 +4241,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001aa4:	1ad3      	subs	r3, r2, r3
  8001aa6:	2b01      	cmp	r3, #1
  8001aa8:	dd2b      	ble.n	8001b02 <createDeleteFixBlock+0x372>
-					if (j<6 && i>5)
+					if (j>5 && i>5)
  8001aaa:	6fbb      	ldr	r3, [r7, #120]	; 0x78
  8001aac:	2b05      	cmp	r3, #5
- 8001aae:	dc12      	bgt.n	8001ad6 <createDeleteFixBlock+0x346>
+ 8001aae:	dd12      	ble.n	8001ad6 <createDeleteFixBlock+0x346>
  8001ab0:	6ffb      	ldr	r3, [r7, #124]	; 0x7c
  8001ab2:	2b05      	cmp	r3, #5
  8001ab4:	dd0f      	ble.n	8001ad6 <createDeleteFixBlock+0x346>
@@ -4261,10 +4261,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001acc:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
  8001ad0:	b289      	uxth	r1, r1
  8001ad2:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i<12)
+					if (j<6 && i<12)
  8001ad6:	6fbb      	ldr	r3, [r7, #120]	; 0x78
  8001ad8:	2b05      	cmp	r3, #5
- 8001ada:	dd12      	ble.n	8001b02 <createDeleteFixBlock+0x372>
+ 8001ada:	dc12      	bgt.n	8001b02 <createDeleteFixBlock+0x372>
  8001adc:	6ffb      	ldr	r3, [r7, #124]	; 0x7c
  8001ade:	2b0b      	cmp	r3, #11
  8001ae0:	dc0f      	bgt.n	8001b02 <createDeleteFixBlock+0x372>
@@ -4305,7 +4305,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001b14:	6ffb      	ldr	r3, [r7, #124]	; 0x7c
  8001b16:	2b11      	cmp	r3, #17
  8001b18:	ddbe      	ble.n	8001a98 <createDeleteFixBlock+0x308>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4335,10 +4335,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001b34:	1ad3      	subs	r3, r2, r3
  8001b36:	2b01      	cmp	r3, #1
  8001b38:	dd41      	ble.n	8001bbe <createDeleteFixBlock+0x42e>
-					if (j<6 && i<6)
+					if (j>5 && i<6)
  8001b3a:	6f3b      	ldr	r3, [r7, #112]	; 0x70
  8001b3c:	2b05      	cmp	r3, #5
- 8001b3e:	dc12      	bgt.n	8001b66 <createDeleteFixBlock+0x3d6>
+ 8001b3e:	dd12      	ble.n	8001b66 <createDeleteFixBlock+0x3d6>
  8001b40:	6f7b      	ldr	r3, [r7, #116]	; 0x74
  8001b42:	2b05      	cmp	r3, #5
  8001b44:	dc0f      	bgt.n	8001b66 <createDeleteFixBlock+0x3d6>
@@ -4375,10 +4375,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001b88:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
  8001b8c:	b289      	uxth	r1, r1
  8001b8e:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>11 && i>5)
+					if (j<12 && i>5)
  8001b92:	6f3b      	ldr	r3, [r7, #112]	; 0x70
  8001b94:	2b0b      	cmp	r3, #11
- 8001b96:	dd12      	ble.n	8001bbe <createDeleteFixBlock+0x42e>
+ 8001b96:	dc12      	bgt.n	8001bbe <createDeleteFixBlock+0x42e>
  8001b98:	6f7b      	ldr	r3, [r7, #116]	; 0x74
  8001b9a:	2b05      	cmp	r3, #5
  8001b9c:	dd0f      	ble.n	8001bbe <createDeleteFixBlock+0x42e>
@@ -4419,7 +4419,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001bd0:	6f7b      	ldr	r3, [r7, #116]	; 0x74
  8001bd2:	2b0b      	cmp	r3, #11
  8001bd4:	dda8      	ble.n	8001b28 <createDeleteFixBlock+0x398>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4449,10 +4449,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001bf0:	1ad3      	subs	r3, r2, r3
  8001bf2:	2b01      	cmp	r3, #1
  8001bf4:	dd28      	ble.n	8001c48 <createDeleteFixBlock+0x4b8>
-					if (j<12 && i<6)
+					if (j>5 && i<6)
  8001bf6:	6ebb      	ldr	r3, [r7, #104]	; 0x68
- 8001bf8:	2b0b      	cmp	r3, #11
- 8001bfa:	dc12      	bgt.n	8001c22 <createDeleteFixBlock+0x492>
+ 8001bf8:	2b05      	cmp	r3, #5
+ 8001bfa:	dd12      	ble.n	8001c22 <createDeleteFixBlock+0x492>
  8001bfc:	6efb      	ldr	r3, [r7, #108]	; 0x6c
  8001bfe:	2b05      	cmp	r3, #5
  8001c00:	dc0f      	bgt.n	8001c22 <createDeleteFixBlock+0x492>
@@ -4469,10 +4469,10 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001c18:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
  8001c1c:	b289      	uxth	r1, r1
  8001c1e:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>11)
+					if (j<6)
  8001c22:	6ebb      	ldr	r3, [r7, #104]	; 0x68
- 8001c24:	2b0b      	cmp	r3, #11
- 8001c26:	dd0f      	ble.n	8001c48 <createDeleteFixBlock+0x4b8>
+ 8001c24:	2b05      	cmp	r3, #5
+ 8001c26:	dc0f      	bgt.n	8001c48 <createDeleteFixBlock+0x4b8>
 						matrix[x0+i][y0-j]=volba;
  8001c28:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  8001c2c:	6efb      	ldr	r3, [r7, #108]	; 0x6c
@@ -4510,7 +4510,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001c5a:	6efb      	ldr	r3, [r7, #108]	; 0x6c
  8001c5c:	2b0b      	cmp	r3, #11
  8001c5e:	ddc1      	ble.n	8001be4 <createDeleteFixBlock+0x454>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4540,29 +4540,29 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001c7a:	1ad3      	subs	r3, r2, r3
  8001c7c:	2b01      	cmp	r3, #1
  8001c7e:	dd28      	ble.n	8001cd2 <createDeleteFixBlock+0x542>
-					if (j<6 && i>11)
+					if (j<6)
  8001c80:	6e3b      	ldr	r3, [r7, #96]	; 0x60
  8001c82:	2b05      	cmp	r3, #5
- 8001c84:	dc12      	bgt.n	8001cac <createDeleteFixBlock+0x51c>
- 8001c86:	6e7b      	ldr	r3, [r7, #100]	; 0x64
- 8001c88:	2b0b      	cmp	r3, #11
- 8001c8a:	dd0f      	ble.n	8001cac <createDeleteFixBlock+0x51c>
+ 8001c84:	dc0f      	bgt.n	8001ca6 <createDeleteFixBlock+0x516>
 						matrix[x0+i][y0-j]=volba;
- 8001c8c:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 8001c90:	6e7b      	ldr	r3, [r7, #100]	; 0x64
+ 8001c86:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8001c8a:	6e7b      	ldr	r3, [r7, #100]	; 0x64
+ 8001c8c:	4413      	add	r3, r2
+ 8001c8e:	021b      	lsls	r3, r3, #8
+ 8001c90:	68fa      	ldr	r2, [r7, #12]
  8001c92:	4413      	add	r3, r2
- 8001c94:	021b      	lsls	r3, r3, #8
- 8001c96:	68fa      	ldr	r2, [r7, #12]
- 8001c98:	4413      	add	r3, r2
- 8001c9a:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8001c9e:	6e3a      	ldr	r2, [r7, #96]	; 0x60
- 8001ca0:	1a8a      	subs	r2, r1, r2
- 8001ca2:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8001ca6:	b289      	uxth	r1, r1
- 8001ca8:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5)
- 8001cac:	6e3b      	ldr	r3, [r7, #96]	; 0x60
- 8001cae:	2b05      	cmp	r3, #5
+ 8001c94:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8001c98:	6e3a      	ldr	r2, [r7, #96]	; 0x60
+ 8001c9a:	1a8a      	subs	r2, r1, r2
+ 8001c9c:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8001ca0:	b289      	uxth	r1, r1
+ 8001ca2:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5 && i>11)
+ 8001ca6:	6e3b      	ldr	r3, [r7, #96]	; 0x60
+ 8001ca8:	2b05      	cmp	r3, #5
+ 8001caa:	dd12      	ble.n	8001cd2 <createDeleteFixBlock+0x542>
+ 8001cac:	6e7b      	ldr	r3, [r7, #100]	; 0x64
+ 8001cae:	2b0b      	cmp	r3, #11
  8001cb0:	dd0f      	ble.n	8001cd2 <createDeleteFixBlock+0x542>
 						matrix[x0+i][y0-j]=volba;
  8001cb2:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
@@ -4601,7 +4601,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001ce4:	6e7b      	ldr	r3, [r7, #100]	; 0x64
  8001ce6:	2b11      	cmp	r3, #17
  8001ce8:	ddc1      	ble.n	8001c6e <createDeleteFixBlock+0x4de>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4631,29 +4631,29 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001d04:	1ad3      	subs	r3, r2, r3
  8001d06:	2b01      	cmp	r3, #1
  8001d08:	dd28      	ble.n	8001d5c <createDeleteFixBlock+0x5cc>
-					if (j<6)
+					if (j<12 && i>5)
  8001d0a:	6dbb      	ldr	r3, [r7, #88]	; 0x58
- 8001d0c:	2b05      	cmp	r3, #5
- 8001d0e:	dc0f      	bgt.n	8001d30 <createDeleteFixBlock+0x5a0>
+ 8001d0c:	2b0b      	cmp	r3, #11
+ 8001d0e:	dc12      	bgt.n	8001d36 <createDeleteFixBlock+0x5a6>
+ 8001d10:	6dfb      	ldr	r3, [r7, #92]	; 0x5c
+ 8001d12:	2b05      	cmp	r3, #5
+ 8001d14:	dd0f      	ble.n	8001d36 <createDeleteFixBlock+0x5a6>
 						matrix[x0+i][y0-j]=volba;
- 8001d10:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 8001d14:	6dfb      	ldr	r3, [r7, #92]	; 0x5c
- 8001d16:	4413      	add	r3, r2
- 8001d18:	021b      	lsls	r3, r3, #8
- 8001d1a:	68fa      	ldr	r2, [r7, #12]
+ 8001d16:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8001d1a:	6dfb      	ldr	r3, [r7, #92]	; 0x5c
  8001d1c:	4413      	add	r3, r2
- 8001d1e:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8001d22:	6dba      	ldr	r2, [r7, #88]	; 0x58
- 8001d24:	1a8a      	subs	r2, r1, r2
- 8001d26:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8001d2a:	b289      	uxth	r1, r1
- 8001d2c:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i>5)
- 8001d30:	6dbb      	ldr	r3, [r7, #88]	; 0x58
- 8001d32:	2b05      	cmp	r3, #5
- 8001d34:	dd12      	ble.n	8001d5c <createDeleteFixBlock+0x5cc>
- 8001d36:	6dfb      	ldr	r3, [r7, #92]	; 0x5c
- 8001d38:	2b05      	cmp	r3, #5
+ 8001d1e:	021b      	lsls	r3, r3, #8
+ 8001d20:	68fa      	ldr	r2, [r7, #12]
+ 8001d22:	4413      	add	r3, r2
+ 8001d24:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8001d28:	6dba      	ldr	r2, [r7, #88]	; 0x58
+ 8001d2a:	1a8a      	subs	r2, r1, r2
+ 8001d2c:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8001d30:	b289      	uxth	r1, r1
+ 8001d32:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>11)
+ 8001d36:	6dbb      	ldr	r3, [r7, #88]	; 0x58
+ 8001d38:	2b0b      	cmp	r3, #11
  8001d3a:	dd0f      	ble.n	8001d5c <createDeleteFixBlock+0x5cc>
 						matrix[x0+i][y0-j]=volba;
  8001d3c:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
@@ -4692,7 +4692,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001d6e:	6dfb      	ldr	r3, [r7, #92]	; 0x5c
  8001d70:	2b0b      	cmp	r3, #11
  8001d72:	ddc1      	ble.n	8001cf8 <createDeleteFixBlock+0x568>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4722,30 +4722,30 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001d8e:	1ad3      	subs	r3, r2, r3
  8001d90:	2b01      	cmp	r3, #1
  8001d92:	dd28      	ble.n	8001de6 <createDeleteFixBlock+0x656>
-					if (j<6)
+					if (j<6 && i<6)
  8001d94:	6d3b      	ldr	r3, [r7, #80]	; 0x50
  8001d96:	2b05      	cmp	r3, #5
- 8001d98:	dc0f      	bgt.n	8001dba <createDeleteFixBlock+0x62a>
+ 8001d98:	dc12      	bgt.n	8001dc0 <createDeleteFixBlock+0x630>
+ 8001d9a:	6d7b      	ldr	r3, [r7, #84]	; 0x54
+ 8001d9c:	2b05      	cmp	r3, #5
+ 8001d9e:	dc0f      	bgt.n	8001dc0 <createDeleteFixBlock+0x630>
 						matrix[x0+i][y0-j]=volba;
- 8001d9a:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 8001d9e:	6d7b      	ldr	r3, [r7, #84]	; 0x54
- 8001da0:	4413      	add	r3, r2
- 8001da2:	021b      	lsls	r3, r3, #8
- 8001da4:	68fa      	ldr	r2, [r7, #12]
+ 8001da0:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8001da4:	6d7b      	ldr	r3, [r7, #84]	; 0x54
  8001da6:	4413      	add	r3, r2
- 8001da8:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8001dac:	6d3a      	ldr	r2, [r7, #80]	; 0x50
- 8001dae:	1a8a      	subs	r2, r1, r2
- 8001db0:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8001db4:	b289      	uxth	r1, r1
- 8001db6:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i<6)
- 8001dba:	6d3b      	ldr	r3, [r7, #80]	; 0x50
- 8001dbc:	2b05      	cmp	r3, #5
- 8001dbe:	dd12      	ble.n	8001de6 <createDeleteFixBlock+0x656>
- 8001dc0:	6d7b      	ldr	r3, [r7, #84]	; 0x54
+ 8001da8:	021b      	lsls	r3, r3, #8
+ 8001daa:	68fa      	ldr	r2, [r7, #12]
+ 8001dac:	4413      	add	r3, r2
+ 8001dae:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8001db2:	6d3a      	ldr	r2, [r7, #80]	; 0x50
+ 8001db4:	1a8a      	subs	r2, r1, r2
+ 8001db6:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8001dba:	b289      	uxth	r1, r1
+ 8001dbc:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5)
+ 8001dc0:	6d3b      	ldr	r3, [r7, #80]	; 0x50
  8001dc2:	2b05      	cmp	r3, #5
- 8001dc4:	dc0f      	bgt.n	8001de6 <createDeleteFixBlock+0x656>
+ 8001dc4:	dd0f      	ble.n	8001de6 <createDeleteFixBlock+0x656>
 						matrix[x0+i][y0-j]=volba;
  8001dc6:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  8001dca:	6d7b      	ldr	r3, [r7, #84]	; 0x54
@@ -4783,7 +4783,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001df8:	6d7b      	ldr	r3, [r7, #84]	; 0x54
  8001dfa:	2b11      	cmp	r3, #17
  8001dfc:	ddc1      	ble.n	8001d82 <createDeleteFixBlock+0x5f2>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4813,33 +4813,33 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001e18:	1ad3      	subs	r3, r2, r3
  8001e1a:	2b01      	cmp	r3, #1
  8001e1c:	dd2b      	ble.n	8001e76 <createDeleteFixBlock+0x6e6>
-					if (j<6 && (i>5 && i<12))
+					if (j<6)
  8001e1e:	6cbb      	ldr	r3, [r7, #72]	; 0x48
  8001e20:	2b05      	cmp	r3, #5
- 8001e22:	dc15      	bgt.n	8001e50 <createDeleteFixBlock+0x6c0>
- 8001e24:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
- 8001e26:	2b05      	cmp	r3, #5
- 8001e28:	dd12      	ble.n	8001e50 <createDeleteFixBlock+0x6c0>
- 8001e2a:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
- 8001e2c:	2b0b      	cmp	r3, #11
- 8001e2e:	dc0f      	bgt.n	8001e50 <createDeleteFixBlock+0x6c0>
+ 8001e22:	dc0f      	bgt.n	8001e44 <createDeleteFixBlock+0x6b4>
 						matrix[x0+i][y0-j]=volba;
- 8001e30:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 8001e34:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
- 8001e36:	4413      	add	r3, r2
- 8001e38:	021b      	lsls	r3, r3, #8
- 8001e3a:	68fa      	ldr	r2, [r7, #12]
- 8001e3c:	4413      	add	r3, r2
- 8001e3e:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8001e42:	6cba      	ldr	r2, [r7, #72]	; 0x48
- 8001e44:	1a8a      	subs	r2, r1, r2
- 8001e46:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8001e4a:	b289      	uxth	r1, r1
- 8001e4c:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5)
- 8001e50:	6cbb      	ldr	r3, [r7, #72]	; 0x48
- 8001e52:	2b05      	cmp	r3, #5
- 8001e54:	dd0f      	ble.n	8001e76 <createDeleteFixBlock+0x6e6>
+ 8001e24:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8001e28:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
+ 8001e2a:	4413      	add	r3, r2
+ 8001e2c:	021b      	lsls	r3, r3, #8
+ 8001e2e:	68fa      	ldr	r2, [r7, #12]
+ 8001e30:	4413      	add	r3, r2
+ 8001e32:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8001e36:	6cba      	ldr	r2, [r7, #72]	; 0x48
+ 8001e38:	1a8a      	subs	r2, r1, r2
+ 8001e3a:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8001e3e:	b289      	uxth	r1, r1
+ 8001e40:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5 && (i>5 && i<12))
+ 8001e44:	6cbb      	ldr	r3, [r7, #72]	; 0x48
+ 8001e46:	2b05      	cmp	r3, #5
+ 8001e48:	dd15      	ble.n	8001e76 <createDeleteFixBlock+0x6e6>
+ 8001e4a:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
+ 8001e4c:	2b05      	cmp	r3, #5
+ 8001e4e:	dd12      	ble.n	8001e76 <createDeleteFixBlock+0x6e6>
+ 8001e50:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
+ 8001e52:	2b0b      	cmp	r3, #11
+ 8001e54:	dc0f      	bgt.n	8001e76 <createDeleteFixBlock+0x6e6>
 						matrix[x0+i][y0-j]=volba;
  8001e56:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  8001e5a:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
@@ -4877,7 +4877,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001e88:	6cfb      	ldr	r3, [r7, #76]	; 0x4c
  8001e8a:	2b11      	cmp	r3, #17
  8001e8c:	ddbe      	ble.n	8001e0c <createDeleteFixBlock+0x67c>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -4971,7 +4971,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001f18:	6c7b      	ldr	r3, [r7, #68]	; 0x44
  8001f1a:	2b0b      	cmp	r3, #11
  8001f1c:	ddbe      	ble.n	8001e9c <createDeleteFixBlock+0x70c>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5001,33 +5001,33 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001f38:	1ad3      	subs	r3, r2, r3
  8001f3a:	2b01      	cmp	r3, #1
  8001f3c:	dd2b      	ble.n	8001f96 <createDeleteFixBlock+0x806>
-					if (j<6)
+					if (j<6 && (i>5 && i<12))
  8001f3e:	6bbb      	ldr	r3, [r7, #56]	; 0x38
  8001f40:	2b05      	cmp	r3, #5
- 8001f42:	dc0f      	bgt.n	8001f64 <createDeleteFixBlock+0x7d4>
+ 8001f42:	dc15      	bgt.n	8001f70 <createDeleteFixBlock+0x7e0>
+ 8001f44:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
+ 8001f46:	2b05      	cmp	r3, #5
+ 8001f48:	dd12      	ble.n	8001f70 <createDeleteFixBlock+0x7e0>
+ 8001f4a:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
+ 8001f4c:	2b0b      	cmp	r3, #11
+ 8001f4e:	dc0f      	bgt.n	8001f70 <createDeleteFixBlock+0x7e0>
 						matrix[x0+i][y0-j]=volba;
- 8001f44:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 8001f48:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
- 8001f4a:	4413      	add	r3, r2
- 8001f4c:	021b      	lsls	r3, r3, #8
- 8001f4e:	68fa      	ldr	r2, [r7, #12]
- 8001f50:	4413      	add	r3, r2
- 8001f52:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8001f56:	6bba      	ldr	r2, [r7, #56]	; 0x38
- 8001f58:	1a8a      	subs	r2, r1, r2
- 8001f5a:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8001f5e:	b289      	uxth	r1, r1
- 8001f60:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && (i>5 && i<12))
- 8001f64:	6bbb      	ldr	r3, [r7, #56]	; 0x38
- 8001f66:	2b05      	cmp	r3, #5
- 8001f68:	dd15      	ble.n	8001f96 <createDeleteFixBlock+0x806>
- 8001f6a:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
- 8001f6c:	2b05      	cmp	r3, #5
- 8001f6e:	dd12      	ble.n	8001f96 <createDeleteFixBlock+0x806>
- 8001f70:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
- 8001f72:	2b0b      	cmp	r3, #11
- 8001f74:	dc0f      	bgt.n	8001f96 <createDeleteFixBlock+0x806>
+ 8001f50:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8001f54:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
+ 8001f56:	4413      	add	r3, r2
+ 8001f58:	021b      	lsls	r3, r3, #8
+ 8001f5a:	68fa      	ldr	r2, [r7, #12]
+ 8001f5c:	4413      	add	r3, r2
+ 8001f5e:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8001f62:	6bba      	ldr	r2, [r7, #56]	; 0x38
+ 8001f64:	1a8a      	subs	r2, r1, r2
+ 8001f66:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8001f6a:	b289      	uxth	r1, r1
+ 8001f6c:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5)
+ 8001f70:	6bbb      	ldr	r3, [r7, #56]	; 0x38
+ 8001f72:	2b05      	cmp	r3, #5
+ 8001f74:	dd0f      	ble.n	8001f96 <createDeleteFixBlock+0x806>
 						matrix[x0+i][y0-j]=volba;
  8001f76:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  8001f7a:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
@@ -5065,7 +5065,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8001fa8:	6bfb      	ldr	r3, [r7, #60]	; 0x3c
  8001faa:	2b11      	cmp	r3, #17
  8001fac:	ddbe      	ble.n	8001f2c <createDeleteFixBlock+0x79c>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5159,7 +5159,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8002038:	6b7b      	ldr	r3, [r7, #52]	; 0x34
  800203a:	2b0b      	cmp	r3, #11
  800203c:	ddbe      	ble.n	8001fbc <createDeleteFixBlock+0x82c>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5189,29 +5189,29 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8002058:	1ad3      	subs	r3, r2, r3
  800205a:	2b01      	cmp	r3, #1
  800205c:	dd28      	ble.n	80020b0 <createDeleteFixBlock+0x920>
-					if (j<12 && i>5)
+					if (j<6)
  800205e:	6abb      	ldr	r3, [r7, #40]	; 0x28
- 8002060:	2b0b      	cmp	r3, #11
- 8002062:	dc12      	bgt.n	800208a <createDeleteFixBlock+0x8fa>
- 8002064:	6afb      	ldr	r3, [r7, #44]	; 0x2c
- 8002066:	2b05      	cmp	r3, #5
- 8002068:	dd0f      	ble.n	800208a <createDeleteFixBlock+0x8fa>
+ 8002060:	2b05      	cmp	r3, #5
+ 8002062:	dc0f      	bgt.n	8002084 <createDeleteFixBlock+0x8f4>
 						matrix[x0+i][y0-j]=volba;
- 800206a:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 800206e:	6afb      	ldr	r3, [r7, #44]	; 0x2c
+ 8002064:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8002068:	6afb      	ldr	r3, [r7, #44]	; 0x2c
+ 800206a:	4413      	add	r3, r2
+ 800206c:	021b      	lsls	r3, r3, #8
+ 800206e:	68fa      	ldr	r2, [r7, #12]
  8002070:	4413      	add	r3, r2
- 8002072:	021b      	lsls	r3, r3, #8
- 8002074:	68fa      	ldr	r2, [r7, #12]
- 8002076:	4413      	add	r3, r2
- 8002078:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 800207c:	6aba      	ldr	r2, [r7, #40]	; 0x28
- 800207e:	1a8a      	subs	r2, r1, r2
- 8002080:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8002084:	b289      	uxth	r1, r1
- 8002086:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>11)
- 800208a:	6abb      	ldr	r3, [r7, #40]	; 0x28
- 800208c:	2b0b      	cmp	r3, #11
+ 8002072:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8002076:	6aba      	ldr	r2, [r7, #40]	; 0x28
+ 8002078:	1a8a      	subs	r2, r1, r2
+ 800207a:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 800207e:	b289      	uxth	r1, r1
+ 8002080:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5 && i>6)
+ 8002084:	6abb      	ldr	r3, [r7, #40]	; 0x28
+ 8002086:	2b05      	cmp	r3, #5
+ 8002088:	dd12      	ble.n	80020b0 <createDeleteFixBlock+0x920>
+ 800208a:	6afb      	ldr	r3, [r7, #44]	; 0x2c
+ 800208c:	2b06      	cmp	r3, #6
  800208e:	dd0f      	ble.n	80020b0 <createDeleteFixBlock+0x920>
 						matrix[x0+i][y0-j]=volba;
  8002090:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
@@ -5250,7 +5250,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80020c2:	6afb      	ldr	r3, [r7, #44]	; 0x2c
  80020c4:	2b0b      	cmp	r3, #11
  80020c6:	ddc1      	ble.n	800204c <createDeleteFixBlock+0x8bc>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5280,29 +5280,29 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80020e2:	1ad3      	subs	r3, r2, r3
  80020e4:	2b01      	cmp	r3, #1
  80020e6:	dd28      	ble.n	800213a <createDeleteFixBlock+0x9aa>
-					if (j<6)
+					if (j<6 && i>11)
  80020e8:	6a3b      	ldr	r3, [r7, #32]
  80020ea:	2b05      	cmp	r3, #5
- 80020ec:	dc0f      	bgt.n	800210e <createDeleteFixBlock+0x97e>
+ 80020ec:	dc12      	bgt.n	8002114 <createDeleteFixBlock+0x984>
+ 80020ee:	6a7b      	ldr	r3, [r7, #36]	; 0x24
+ 80020f0:	2b0b      	cmp	r3, #11
+ 80020f2:	dd0f      	ble.n	8002114 <createDeleteFixBlock+0x984>
 						matrix[x0+i][y0-j]=volba;
- 80020ee:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 80020f2:	6a7b      	ldr	r3, [r7, #36]	; 0x24
- 80020f4:	4413      	add	r3, r2
- 80020f6:	021b      	lsls	r3, r3, #8
- 80020f8:	68fa      	ldr	r2, [r7, #12]
+ 80020f4:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 80020f8:	6a7b      	ldr	r3, [r7, #36]	; 0x24
  80020fa:	4413      	add	r3, r2
- 80020fc:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 8002100:	6a3a      	ldr	r2, [r7, #32]
- 8002102:	1a8a      	subs	r2, r1, r2
- 8002104:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8002108:	b289      	uxth	r1, r1
- 800210a:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i>11)
- 800210e:	6a3b      	ldr	r3, [r7, #32]
- 8002110:	2b05      	cmp	r3, #5
- 8002112:	dd12      	ble.n	800213a <createDeleteFixBlock+0x9aa>
- 8002114:	6a7b      	ldr	r3, [r7, #36]	; 0x24
- 8002116:	2b0b      	cmp	r3, #11
+ 80020fc:	021b      	lsls	r3, r3, #8
+ 80020fe:	68fa      	ldr	r2, [r7, #12]
+ 8002100:	4413      	add	r3, r2
+ 8002102:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8002106:	6a3a      	ldr	r2, [r7, #32]
+ 8002108:	1a8a      	subs	r2, r1, r2
+ 800210a:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 800210e:	b289      	uxth	r1, r1
+ 8002110:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5)
+ 8002114:	6a3b      	ldr	r3, [r7, #32]
+ 8002116:	2b05      	cmp	r3, #5
  8002118:	dd0f      	ble.n	800213a <createDeleteFixBlock+0x9aa>
 						matrix[x0+i][y0-j]=volba;
  800211a:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
@@ -5341,7 +5341,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  800214c:	6a7b      	ldr	r3, [r7, #36]	; 0x24
  800214e:	2b11      	cmp	r3, #17
  8002150:	ddc1      	ble.n	80020d6 <createDeleteFixBlock+0x946>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5371,30 +5371,30 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  800216c:	1ad3      	subs	r3, r2, r3
  800216e:	2b01      	cmp	r3, #1
  8002170:	dd28      	ble.n	80021c4 <createDeleteFixBlock+0xa34>
-					if (j<6)
+					if (j<12 && i<6)
  8002172:	69bb      	ldr	r3, [r7, #24]
- 8002174:	2b05      	cmp	r3, #5
- 8002176:	dc0f      	bgt.n	8002198 <createDeleteFixBlock+0xa08>
+ 8002174:	2b0b      	cmp	r3, #11
+ 8002176:	dc12      	bgt.n	800219e <createDeleteFixBlock+0xa0e>
+ 8002178:	69fb      	ldr	r3, [r7, #28]
+ 800217a:	2b05      	cmp	r3, #5
+ 800217c:	dc0f      	bgt.n	800219e <createDeleteFixBlock+0xa0e>
 						matrix[x0+i][y0-j]=volba;
- 8002178:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 800217c:	69fb      	ldr	r3, [r7, #28]
- 800217e:	4413      	add	r3, r2
- 8002180:	021b      	lsls	r3, r3, #8
- 8002182:	68fa      	ldr	r2, [r7, #12]
+ 800217e:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8002182:	69fb      	ldr	r3, [r7, #28]
  8002184:	4413      	add	r3, r2
- 8002186:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 800218a:	69ba      	ldr	r2, [r7, #24]
- 800218c:	1a8a      	subs	r2, r1, r2
- 800218e:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8002192:	b289      	uxth	r1, r1
- 8002194:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5 && i<6)
- 8002198:	69bb      	ldr	r3, [r7, #24]
- 800219a:	2b05      	cmp	r3, #5
- 800219c:	dd12      	ble.n	80021c4 <createDeleteFixBlock+0xa34>
- 800219e:	69fb      	ldr	r3, [r7, #28]
- 80021a0:	2b05      	cmp	r3, #5
- 80021a2:	dc0f      	bgt.n	80021c4 <createDeleteFixBlock+0xa34>
+ 8002186:	021b      	lsls	r3, r3, #8
+ 8002188:	68fa      	ldr	r2, [r7, #12]
+ 800218a:	4413      	add	r3, r2
+ 800218c:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8002190:	69ba      	ldr	r2, [r7, #24]
+ 8002192:	1a8a      	subs	r2, r1, r2
+ 8002194:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 8002198:	b289      	uxth	r1, r1
+ 800219a:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>11)
+ 800219e:	69bb      	ldr	r3, [r7, #24]
+ 80021a0:	2b0b      	cmp	r3, #11
+ 80021a2:	dd0f      	ble.n	80021c4 <createDeleteFixBlock+0xa34>
 						matrix[x0+i][y0-j]=volba;
  80021a4:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  80021a8:	69fb      	ldr	r3, [r7, #28]
@@ -5432,7 +5432,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80021d6:	69fb      	ldr	r3, [r7, #28]
  80021d8:	2b0b      	cmp	r3, #11
  80021da:	ddc1      	ble.n	8002160 <createDeleteFixBlock+0x9d0>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -5462,30 +5462,30 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  80021f6:	1ad3      	subs	r3, r2, r3
  80021f8:	2b01      	cmp	r3, #1
  80021fa:	dd28      	ble.n	800224e <createDeleteFixBlock+0xabe>
-					if (j<6 && i<6)
+					if (j<6)
  80021fc:	693b      	ldr	r3, [r7, #16]
  80021fe:	2b05      	cmp	r3, #5
- 8002200:	dc12      	bgt.n	8002228 <createDeleteFixBlock+0xa98>
- 8002202:	697b      	ldr	r3, [r7, #20]
- 8002204:	2b05      	cmp	r3, #5
- 8002206:	dc0f      	bgt.n	8002228 <createDeleteFixBlock+0xa98>
+ 8002200:	dc0f      	bgt.n	8002222 <createDeleteFixBlock+0xa92>
 						matrix[x0+i][y0-j]=volba;
- 8002208:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
- 800220c:	697b      	ldr	r3, [r7, #20]
+ 8002202:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
+ 8002206:	697b      	ldr	r3, [r7, #20]
+ 8002208:	4413      	add	r3, r2
+ 800220a:	021b      	lsls	r3, r3, #8
+ 800220c:	68fa      	ldr	r2, [r7, #12]
  800220e:	4413      	add	r3, r2
- 8002210:	021b      	lsls	r3, r3, #8
- 8002212:	68fa      	ldr	r2, [r7, #12]
- 8002214:	4413      	add	r3, r2
- 8002216:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
- 800221a:	693a      	ldr	r2, [r7, #16]
- 800221c:	1a8a      	subs	r2, r1, r2
- 800221e:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
- 8002222:	b289      	uxth	r1, r1
- 8002224:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
-					if (j>5)
- 8002228:	693b      	ldr	r3, [r7, #16]
+ 8002210:	f9b7 1008 	ldrsh.w	r1, [r7, #8]
+ 8002214:	693a      	ldr	r2, [r7, #16]
+ 8002216:	1a8a      	subs	r2, r1, r2
+ 8002218:	f8d7 10b0 	ldr.w	r1, [r7, #176]	; 0xb0
+ 800221c:	b289      	uxth	r1, r1
+ 800221e:	f823 1012 	strh.w	r1, [r3, r2, lsl #1]
+					if (j>5 && i<6)
+ 8002222:	693b      	ldr	r3, [r7, #16]
+ 8002224:	2b05      	cmp	r3, #5
+ 8002226:	dd12      	ble.n	800224e <createDeleteFixBlock+0xabe>
+ 8002228:	697b      	ldr	r3, [r7, #20]
  800222a:	2b05      	cmp	r3, #5
- 800222c:	dd0f      	ble.n	800224e <createDeleteFixBlock+0xabe>
+ 800222c:	dc0f      	bgt.n	800224e <createDeleteFixBlock+0xabe>
 						matrix[x0+i][y0-j]=volba;
  800222e:	f9b7 200a 	ldrsh.w	r2, [r7, #10]
  8002232:	697b      	ldr	r3, [r7, #20]
@@ -5523,7 +5523,7 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
  8002260:	697b      	ldr	r3, [r7, #20]
  8002262:	2b11      	cmp	r3, #17
  8002264:	ddc1      	ble.n	80021ea <createDeleteFixBlock+0xa5a>
-					if (j>5)
+					if (j>5 && i<6)
 						matrix[x0+i][y0-j]=volba;
 				}
 			}
@@ -7642,12 +7642,12 @@ int main(void)
  80033fa:	f507 420f 	add.w	r2, r7, #36608	; 0x8f00
  80033fe:	f102 02c8 	add.w	r2, r2, #200	; 0xc8
  8003402:	6013      	str	r3, [r2, #0]
-	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 
 
-	  // vykresli dany objekt
-	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+
+	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
+	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
  8003404:	f507 420b 	add.w	r2, r7, #35584	; 0x8b00
  8003408:	f102 02d0 	add.w	r2, r2, #208	; 0xd0
  800340c:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
@@ -7666,107 +7666,111 @@ int main(void)
  8003432:	b21a      	sxth	r2, r3
  8003434:	f107 00d0 	add.w	r0, r7, #208	; 0xd0
  8003438:	38cc      	subs	r0, #204	; 0xcc
- 800343a:	2301      	movs	r3, #1
- 800343c:	9300      	str	r3, [sp, #0]
- 800343e:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 8003442:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
- 8003446:	681b      	ldr	r3, [r3, #0]
- 8003448:	f7fe f9a2 	bl	8001790 <createDeleteFixBlock>
-	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
- 800344c:	f507 420b 	add.w	r2, r7, #35584	; 0x8b00
- 8003450:	f102 02d0 	add.w	r2, r2, #208	; 0xd0
- 8003454:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 8003458:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 800345c:	681b      	ldr	r3, [r3, #0]
- 800345e:	4413      	add	r3, r2
- 8003460:	781b      	ldrb	r3, [r3, #0]
- 8003462:	b219      	sxth	r1, r3
- 8003464:	f507 4207 	add.w	r2, r7, #34560	; 0x8700
- 8003468:	f102 02e8 	add.w	r2, r2, #232	; 0xe8
- 800346c:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 8003470:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 8003474:	681b      	ldr	r3, [r3, #0]
- 8003476:	4413      	add	r3, r2
- 8003478:	781b      	ldrb	r3, [r3, #0]
- 800347a:	b21a      	sxth	r2, r3
- 800347c:	f107 00d0 	add.w	r0, r7, #208	; 0xd0
- 8003480:	38cc      	subs	r0, #204	; 0xcc
- 8003482:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 8003486:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
- 800348a:	681b      	ldr	r3, [r3, #0]
- 800348c:	f7fe fef0 	bl	8002270 <checkBlockade>
- 8003490:	4603      	mov	r3, r0
- 8003492:	2b00      	cmp	r3, #0
- 8003494:	d04d      	beq.n	8003532 <main+0x422>
+ 800343a:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 800343e:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
+ 8003442:	681b      	ldr	r3, [r3, #0]
+ 8003444:	f7fe ff14 	bl	8002270 <checkBlockade>
+ 8003448:	4603      	mov	r3, r0
+ 800344a:	2b00      	cmp	r3, #0
+ 800344c:	d04d      	beq.n	80034ea <main+0x3da>
 	  {
 		  // zastavi sa objekt
 		  yDir[count] = 0;
- 8003496:	f507 4200 	add.w	r2, r7, #32768	; 0x8000
- 800349a:	f102 0218 	add.w	r2, r2, #24
- 800349e:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 80034a2:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 80034a6:	681b      	ldr	r3, [r3, #0]
- 80034a8:	4413      	add	r3, r2
- 80034aa:	2200      	movs	r2, #0
- 80034ac:	701a      	strb	r2, [r3, #0]
+ 800344e:	f507 4200 	add.w	r2, r7, #32768	; 0x8000
+ 8003452:	f102 0218 	add.w	r2, r2, #24
+ 8003456:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 800345a:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 800345e:	681b      	ldr	r3, [r3, #0]
+ 8003460:	4413      	add	r3, r2
+ 8003462:	2200      	movs	r2, #0
+ 8003464:	701a      	strb	r2, [r3, #0]
 		  // necha objekt na konecnom mieste
 		  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 3);
- 80034ae:	f507 420b 	add.w	r2, r7, #35584	; 0x8b00
- 80034b2:	f102 02d0 	add.w	r2, r2, #208	; 0xd0
- 80034b6:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 80034ba:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 80034be:	681b      	ldr	r3, [r3, #0]
- 80034c0:	4413      	add	r3, r2
- 80034c2:	781b      	ldrb	r3, [r3, #0]
- 80034c4:	b219      	sxth	r1, r3
- 80034c6:	f507 4207 	add.w	r2, r7, #34560	; 0x8700
- 80034ca:	f102 02e8 	add.w	r2, r2, #232	; 0xe8
- 80034ce:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 80034d2:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 80034d6:	681b      	ldr	r3, [r3, #0]
- 80034d8:	4413      	add	r3, r2
- 80034da:	781b      	ldrb	r3, [r3, #0]
- 80034dc:	b21a      	sxth	r2, r3
- 80034de:	f107 00d0 	add.w	r0, r7, #208	; 0xd0
- 80034e2:	38cc      	subs	r0, #204	; 0xcc
- 80034e4:	2303      	movs	r3, #3
- 80034e6:	9300      	str	r3, [sp, #0]
- 80034e8:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 80034ec:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
- 80034f0:	681b      	ldr	r3, [r3, #0]
- 80034f2:	f7fe f94d 	bl	8001790 <createDeleteFixBlock>
+ 8003466:	f507 420b 	add.w	r2, r7, #35584	; 0x8b00
+ 800346a:	f102 02d0 	add.w	r2, r2, #208	; 0xd0
+ 800346e:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 8003472:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 8003476:	681b      	ldr	r3, [r3, #0]
+ 8003478:	4413      	add	r3, r2
+ 800347a:	781b      	ldrb	r3, [r3, #0]
+ 800347c:	b219      	sxth	r1, r3
+ 800347e:	f507 4207 	add.w	r2, r7, #34560	; 0x8700
+ 8003482:	f102 02e8 	add.w	r2, r2, #232	; 0xe8
+ 8003486:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 800348a:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 800348e:	681b      	ldr	r3, [r3, #0]
+ 8003490:	4413      	add	r3, r2
+ 8003492:	781b      	ldrb	r3, [r3, #0]
+ 8003494:	b21a      	sxth	r2, r3
+ 8003496:	f107 00d0 	add.w	r0, r7, #208	; 0xd0
+ 800349a:	38cc      	subs	r0, #204	; 0xcc
+ 800349c:	2303      	movs	r3, #3
+ 800349e:	9300      	str	r3, [sp, #0]
+ 80034a0:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 80034a4:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
+ 80034a8:	681b      	ldr	r3, [r3, #0]
+ 80034aa:	f7fe f971 	bl	8001790 <createDeleteFixBlock>
 			  lcdPutS("Please press reset  to start over!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 			  break;
 		  }*/
 
 		  // vygenerujeme dalsi objekt
 		  count++;
- 80034f6:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
- 80034fa:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
- 80034fe:	681b      	ldr	r3, [r3, #0]
- 8003500:	3301      	adds	r3, #1
- 8003502:	f507 420f 	add.w	r2, r7, #36608	; 0x8f00
- 8003506:	f102 02cc 	add.w	r2, r2, #204	; 0xcc
- 800350a:	6013      	str	r3, [r2, #0]
+ 80034ae:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 80034b2:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 80034b6:	681b      	ldr	r3, [r3, #0]
+ 80034b8:	3301      	adds	r3, #1
+ 80034ba:	f507 420f 	add.w	r2, r7, #36608	; 0x8f00
+ 80034be:	f102 02cc 	add.w	r2, r2, #204	; 0xcc
+ 80034c2:	6013      	str	r3, [r2, #0]
 		  cisloTvaru = AD_value%19;
- 800350c:	4b0c      	ldr	r3, [pc, #48]	; (8003540 <main+0x430>)
- 800350e:	681a      	ldr	r2, [r3, #0]
- 8003510:	4b0c      	ldr	r3, [pc, #48]	; (8003544 <main+0x434>)
- 8003512:	fb83 1302 	smull	r1, r3, r3, r2
- 8003516:	10d9      	asrs	r1, r3, #3
- 8003518:	17d3      	asrs	r3, r2, #31
- 800351a:	1ac9      	subs	r1, r1, r3
- 800351c:	460b      	mov	r3, r1
- 800351e:	00db      	lsls	r3, r3, #3
- 8003520:	440b      	add	r3, r1
- 8003522:	005b      	lsls	r3, r3, #1
- 8003524:	440b      	add	r3, r1
- 8003526:	1ad3      	subs	r3, r2, r3
- 8003528:	f507 420f 	add.w	r2, r7, #36608	; 0x8f00
- 800352c:	f102 02c4 	add.w	r2, r2, #196	; 0xc4
- 8003530:	6013      	str	r3, [r2, #0]
-		  //lcdPutS(cislo2, lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	  }
+ 80034c4:	4b1e      	ldr	r3, [pc, #120]	; (8003540 <main+0x430>)
+ 80034c6:	681a      	ldr	r2, [r3, #0]
+ 80034c8:	4b1e      	ldr	r3, [pc, #120]	; (8003544 <main+0x434>)
+ 80034ca:	fb83 1302 	smull	r1, r3, r3, r2
+ 80034ce:	10d9      	asrs	r1, r3, #3
+ 80034d0:	17d3      	asrs	r3, r2, #31
+ 80034d2:	1ac9      	subs	r1, r1, r3
+ 80034d4:	460b      	mov	r3, r1
+ 80034d6:	00db      	lsls	r3, r3, #3
+ 80034d8:	440b      	add	r3, r1
+ 80034da:	005b      	lsls	r3, r3, #1
+ 80034dc:	440b      	add	r3, r1
+ 80034de:	1ad3      	subs	r3, r2, r3
+ 80034e0:	f507 420f 	add.w	r2, r7, #36608	; 0x8f00
+ 80034e4:	f102 02c4 	add.w	r2, r2, #196	; 0xc4
+ 80034e8:	6013      	str	r3, [r2, #0]
+	  //lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+
+
+	  // vykresli dany objekt
+	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+ 80034ea:	f507 420b 	add.w	r2, r7, #35584	; 0x8b00
+ 80034ee:	f102 02d0 	add.w	r2, r2, #208	; 0xd0
+ 80034f2:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 80034f6:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 80034fa:	681b      	ldr	r3, [r3, #0]
+ 80034fc:	4413      	add	r3, r2
+ 80034fe:	781b      	ldrb	r3, [r3, #0]
+ 8003500:	b219      	sxth	r1, r3
+ 8003502:	f507 4207 	add.w	r2, r7, #34560	; 0x8700
+ 8003506:	f102 02e8 	add.w	r2, r2, #232	; 0xe8
+ 800350a:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 800350e:	f103 03cc 	add.w	r3, r3, #204	; 0xcc
+ 8003512:	681b      	ldr	r3, [r3, #0]
+ 8003514:	4413      	add	r3, r2
+ 8003516:	781b      	ldrb	r3, [r3, #0]
+ 8003518:	b21a      	sxth	r2, r3
+ 800351a:	f107 00d0 	add.w	r0, r7, #208	; 0xd0
+ 800351e:	38cc      	subs	r0, #204	; 0xcc
+ 8003520:	2301      	movs	r3, #1
+ 8003522:	9300      	str	r3, [sp, #0]
+ 8003524:	f507 430f 	add.w	r3, r7, #36608	; 0x8f00
+ 8003528:	f103 03c4 	add.w	r3, r3, #196	; 0xc4
+ 800352c:	681b      	ldr	r3, [r3, #0]
+ 800352e:	f7fe f92f 	bl	8001790 <createDeleteFixBlock>
+
 
 
 
