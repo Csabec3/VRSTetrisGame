@@ -718,7 +718,6 @@ void createFrame(uint16_t matrix[128][128]){
 void createText(){
 	lcdPutS("Tetris", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 	lcdPutS("Level", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("1", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
@@ -761,3 +760,4 @@ int rotateObject(int cisloTvaru){
 	  cisloTvaru-=3;
 	return cisloTvaru;
 }
+

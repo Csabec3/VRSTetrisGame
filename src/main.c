@@ -651,6 +651,8 @@ int main(void)
   	int count;					// pocitadlo objektu
   	int score = 0;				// score v tvare int
   	char scoree[8];				// score v tvare string
+  	int level = 1;
+  	char lvl[2];
   	uint16_t matrix[128][128];	// matica hry
 
   	//vytvorenie objektov

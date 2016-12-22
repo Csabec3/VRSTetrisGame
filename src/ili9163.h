@@ -157,7 +157,6 @@ int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 int checkLineFilled(uint16_t matrix[128][128]);
 
 
-
 int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height);
 
 int checkGameOver(uint16_t matrix[128][128]);
