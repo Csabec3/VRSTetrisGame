@@ -756,7 +756,7 @@ int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloT
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+12][y0-12]==3 || matrix[x0+12][y0-18]==2 || matrix[x0+12][y0-18]==3)
+		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+6][y0-6]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+6][y0-12]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+6][y0-18]==2 || matrix[x0+6][y0-18]==3)
 			temp = 1;
 	}
 	// ak objekt je stvorec _

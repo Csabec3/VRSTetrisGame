@@ -680,10 +680,22 @@ int main(void)
 
 	  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
 	  if ((AD_value>1700) && (AD_value<2300)){
-		  blockX[count] -= xDir[count]; // dolava
+		  xDir[count] = 6;
+		  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
+		  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
+			  xDir[count] = 0;
+		  }
+		  else
+			  blockX[count] -= xDir[count]; // dolava
 	  }
 	  else if ((AD_value>2500) && (AD_value<3100)){
-		  blockX[count] += xDir[count]; // doprava
+		  xDir[count] = 6;
+		  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
+		  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
+			  xDir[count] = 0;
+		  }
+		  else
+			  blockX[count] += xDir[count]; // doprava
 	  }
 	  // ak stlacime stvrte tlacidlo, otoci sa objekt
 	  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
@@ -698,20 +710,8 @@ int main(void)
 		  else
 			  blockY[count] += 6;
 	  }
-	  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-	  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
-		  xDir[count] = 0;
-		  if ((AD_value>2500) && (AD_value<3100)){
-			  xDir[count] = 6;
-		  }
-	  }
-	  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-	  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
-		  xDir[count] = 0;
-		  if ((AD_value>1700) && (AD_value<2300)){
-			  xDir[count] = 6;
-		  }
-	  }
+
+
 	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na lavej strane a objektom na pravej strane
 	  /*if (blockX[count]-1 < 57 && checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){
 		  xDir[count] = 0;
