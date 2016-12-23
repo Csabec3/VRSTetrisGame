@@ -699,9 +699,10 @@ int main(void)
 	  }
 	  // ak stlacime stvrte tlacidlo, otoci sa objekt
 	  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
-		  //if (checkRotation(matrix, blockX[count], blockY[count], cisloTvaru))
-		  cisloTvaru = rotateObject(cisloTvaru);
-		  cc=1;
+		  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
+			  cisloTvaru = rotateObject(cisloTvaru);
+		  	  cc=1;
+		  }
 	  }
 	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
 	  else if ((AD_value>3300) && (AD_value<3450)){
@@ -710,20 +711,6 @@ int main(void)
 		  else
 			  blockY[count] += 6;
 	  }
-
-
-	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na lavej strane a objektom na pravej strane
-	  /*if (blockX[count]-1 < 57 && checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){
-		  xDir[count] = 0;
-	  }
-	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na pravej strane a objektom na lavej strane
-	  if (blockX[count]+length > 116 && checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){
-		  xDir[count] = 0;
-	  }
-	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na pravej strane a ramcom na lavej strane
-	  if (checkNextToBlock(matrix, blockX[count]+length,blockY[count], height) && checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){
-		  xDir[count] = 0;
-	  }*/
 
 	  // checkuje naplnene riadky
 	  score += checkLineFilled(matrix);
