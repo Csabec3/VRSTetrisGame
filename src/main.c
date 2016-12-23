@@ -651,8 +651,6 @@ int main(void)
   	int count;					// pocitadlo objektu
   	int score = 0;				// score v tvare int
   	char scoree[8];				// score v tvare string
-  	int level = 1;
-  	char lvl[2];
   	uint16_t matrix[128][128];	// matica hry
 
   	//vytvorenie objektov
@@ -694,27 +692,26 @@ int main(void)
 		  cc=1;
 	  }
 	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
-	  else if ((AD_value>3400) && (AD_value<3500)){
+	  else if ((AD_value>3300) && (AD_value<3450)){
 		  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
 			  blockY[count] += 0;
 		  else
 			  blockY[count] += 6;
 	  }
-
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-	  /*if (blockX[count]-1 < 57 || checkNextToBlock(matrix, blockX[count]-1,blockY[count], height)){ // lava strana
+	  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
 		  xDir[count] = 0;
-		  if ((AD_value>2500) && (AD_value<3200)){
-			  xDir[count] = 12;
+		  if ((AD_value>2500) && (AD_value<3100)){
+			  xDir[count] = 6;
 		  }
-	  }*/
+	  }
 	  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-	  /*if (blockX[count]+length > 116 || checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){ // prava strana
+	  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
 		  xDir[count] = 0;
 		  if ((AD_value>1700) && (AD_value<2300)){
 			  xDir[count] = 6;
 		  }
-	  }*/
+	  }
 	  // v kazdom kroku checkuje ci sa nenachadza medzi ramcom na lavej strane a objektom na pravej strane
 	  /*if (blockX[count]-1 < 57 && checkNextToBlock(matrix, blockX[count]+length,blockY[count], height)){
 		  xDir[count] = 0;

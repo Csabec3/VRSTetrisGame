@@ -155,9 +155,9 @@ void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int
 int rotateObject(int cisloTvaru);
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkLineFilled(uint16_t matrix[128][128]);
+int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 
-
-int checkNextToBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int height);
 
 int checkGameOver(uint16_t matrix[128][128]);
 #endif /* ILI9163LCD_H_ */
