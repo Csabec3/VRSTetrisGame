@@ -730,24 +730,18 @@ int main(void)
 		  // necha objekt na konecnom mieste
 		  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
 		  // GAME OVER
-		  /*if(checkGameOver(matrix)){
-			  for(int i=57;i<117;i++)
-			  		for(int j=126;j<127;j++){
-			  			matrix[j][i]=3;
-			  		}
-			  /*lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		  if(checkGameOver(matrix, blockY[count], cisloTvaru)){
+			  matrixPlot(matrix, cisloTvaru);
+			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 			  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 			  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 			  lcdPutS("Please press reset  to start over!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-			  break;*/
-		  //}
-
+			  break;
+		  }
 		  // vygenerujeme dalsi objekt
 		  count++;
 		  cisloTvaru = generateNumber(AD_value);
-
-
 	  }
 	  // vykresli dany objekt
 	  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);

@@ -145,16 +145,16 @@ void lcdInitialise(uint8_t orientation)
     lcdWriteParameter(0x40); // nVM = 0, VMF = 64: VCOMH output = VMH, VCOML output = VML
 
     lcdWriteCommand(SET_COLUMN_ADDRESS);
-    lcdWriteParameter(0x1f); // XSH
+    lcdWriteParameter(0x20); // XSH
     lcdWriteParameter(0x00); // XSL
-    lcdWriteParameter(0x1f); // XEH
+    lcdWriteParameter(0x20); // XEH
     lcdWriteParameter(0x7f); // XEL (128 pixels x)
 
     lcdWriteCommand(SET_PAGE_ADDRESS);
     lcdWriteParameter(0x00);
-    lcdWriteParameter(0x1f);
+    lcdWriteParameter(0x20);
     lcdWriteParameter(0x00);
-    lcdWriteParameter(0x9f); // 128 pixels y
+    lcdWriteParameter(0xA0); // 128 pixels y
 
 	// Select display orientation
     lcdWriteCommand(SET_ADDRESS_MODE);
@@ -173,16 +173,16 @@ void lcdClearDisplay(uint16_t colour)
 
 	// Set the column address to 0-127
 	lcdWriteCommand(SET_COLUMN_ADDRESS);
-	    lcdWriteParameter(0x1f); // XSH
+	    lcdWriteParameter(0x20); // XSH
 	    lcdWriteParameter(0x00); // XSL
-	    lcdWriteParameter(0x1f); // XEH
+	    lcdWriteParameter(0x20); // XEH
 	    lcdWriteParameter(0x7f); // XEL (128 pixels x)
 
 	    lcdWriteCommand(SET_PAGE_ADDRESS);
 	    lcdWriteParameter(0x00);
-	    lcdWriteParameter(0x1f);
+	    lcdWriteParameter(0x20);
 	    lcdWriteParameter(0x00);
-	    lcdWriteParameter(0x9f); // 128 pixels y
+	    lcdWriteParameter(0xA0); // 128 pixels y
 
 	// Plot the pixels
 	lcdWriteCommand(WRITE_MEMORY_START);
@@ -201,16 +201,16 @@ void lcdPutCh(unsigned char character, uint8_t x, uint8_t y, uint16_t fgColour, 
 	// update the memory pointer saving us a good few bytes
 
 	lcdWriteCommand(SET_COLUMN_ADDRESS); // Horizontal Address Start Position
-	lcdWriteParameter(0x1f);
+	lcdWriteParameter(0x20);
 	lcdWriteParameter(x);
-	lcdWriteParameter(0x1f);
+	lcdWriteParameter(0x20);
 	lcdWriteParameter(x+5);
 
 	lcdWriteCommand(SET_PAGE_ADDRESS); // Vertical Address end Position
 	lcdWriteParameter(0x00);
 	lcdWriteParameter(y+32);
 	lcdWriteParameter(0x00);
-	lcdWriteParameter(0x9f);
+	lcdWriteParameter(0xA0);
 
 	lcdWriteCommand(WRITE_MEMORY_START);
 
@@ -281,16 +281,16 @@ void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
 	}
 
 	lcdWriteCommand(SET_COLUMN_ADDRESS); // Horizontal Address Start Position
-	lcdWriteParameter(0x1f);
+	lcdWriteParameter(0x20);
 	lcdWriteParameter(56);
-	lcdWriteParameter(0x1f);
+	lcdWriteParameter(0x20);
 	lcdWriteParameter(117);
 
 	lcdWriteCommand(SET_PAGE_ADDRESS); // Vertical Address end Position
 	lcdWriteParameter(56);
 	lcdWriteParameter(0x20);
 	lcdWriteParameter(56);
-	lcdWriteParameter(159);
+	lcdWriteParameter(160);
 
 	lcdWriteCommand(WRITE_MEMORY_START);
 
@@ -967,15 +967,21 @@ int checkLineFilled(uint16_t matrix[128][128]){
 	return temp;
 }
 
-int checkGameOver(uint16_t matrix[128][128]){
+int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru){
 	int temp = 0;
-	for(int i=57;i<117;i++)
-		for(int j=126;j<127;j++){
-			for (int z = 2; z<10; z++)
-				if (matrix[j][i]==z){
-					temp=1;
-				}
-	}
+	for (int i=0; i<19; i++)
+		if (i!=2)
+			if ((cisloTvaru == i) && (y0-6)==0)
+				temp=1;
+
+
+
+	/*for(int i=57;i<117;i++)
+		for (int z = 2; z<10; z++)
+			if (matrix[120][i]==z){
+				temp=1;
+				matrix[120][i]=2;
+			}*/
 	return temp;
 }
 
