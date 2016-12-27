@@ -652,6 +652,8 @@ int main(void)
   	int count;					// pocitadlo objektu
   	int score = 0;				// score v tvare int
   	char scoree[8];				// score v tvare string
+  	int lines = 0;
+  	char line[10];
   	uint16_t matrix[128][128];	// matica hry
 
   	//vytvorenie objektov
@@ -665,6 +667,7 @@ int main(void)
   	int cc=0;
   	char time[10];
   	int cisloTvaru;
+  	int tempScore=0;
 
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
@@ -717,10 +720,15 @@ int main(void)
 	  }
 
 	  // checkuje naplnene riadky
+	  tempScore = score;
 	  score += checkLineFilled(matrix);
+	  lines += returnLines(tempScore, score);
 	  // Vypise score
 	  sprintf(scoree, "%d", score);
 	  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+	  sprintf(line, "%d", lines);
+	  lcdPutS(line, lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
 	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))

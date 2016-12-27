@@ -973,15 +973,6 @@ int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru){
 		if (i!=2)
 			if ((cisloTvaru == i) && (y0-6)==0)
 				temp=1;
-
-
-
-	/*for(int i=57;i<117;i++)
-		for (int z = 2; z<10; z++)
-			if (matrix[120][i]==z){
-				temp=1;
-				matrix[120][i]=2;
-			}*/
 	return temp;
 }
 
@@ -1002,7 +993,7 @@ void createFrame(uint16_t matrix[128][128]){
 
 void createText(){
 	lcdPutS("Tetris", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-	lcdPutS("Time", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Lines", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
@@ -1567,4 +1558,28 @@ int generateNumber(volatile int AD_value){
 	}
 
 	return cisloTvaru;
+}
+
+int returnLines(int tempScore, int score){
+	int lines = 0;
+	int temp = score - tempScore;
+
+	switch(temp){
+		case 0:
+			lines = 0;
+			break;
+		case 100:
+			lines = 1;
+			break;
+		case 200:
+			lines = 2;
+			break;
+		case 300:
+			lines = 3;
+			break;
+		case 800:
+			lines = 4;
+			break;
+	}
+	return lines;
 }

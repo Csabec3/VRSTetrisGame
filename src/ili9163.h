@@ -160,6 +160,7 @@ int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int generateNumber(volatile int AD_value);
-
 int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru);
+int returnLines(int tempScore, int score);
+
 #endif /* ILI9163LCD_H_ */
