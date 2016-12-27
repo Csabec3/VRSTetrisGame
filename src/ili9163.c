@@ -318,14 +318,32 @@ void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
 			colour = decodeRgbValue(31, 31, 31);
 		}
 		else if (pixels[x]==3){
-			colour = decodeRgbValue(31, 31, 31);
+			colour = decodeRgbValue(31, 31, 0);
+		}
+		else if (pixels[x]==4){
+			colour = decodeRgbValue(0, 31, 31);
+		}
+		else if (pixels[x]==5){
+			colour = decodeRgbValue(31, 0, 0);
+		}
+		else if (pixels[x]==6){
+			colour = decodeRgbValue(0, 31, 0);
+		}
+		else if (pixels[x]==7){
+			colour = decodeRgbValue(0, 0, 31);
+		}
+		else if (pixels[x]==8){
+			colour = decodeRgbValue(15, 0, 31);
+		}
+		else if (pixels[x]==9){
+			colour = decodeRgbValue(31, 15, 31);
 		}
 		lcdWriteData(colour >> 8, colour);;
 	}
 
 }
 
-void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba){
+void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba){
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
 		for(int i=0;i<12;i++)
@@ -551,98 +569,117 @@ int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3 || matrix[x0+18][y0+1]==2 || matrix[x0+18][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i || matrix[x0+18][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0-5]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		if (matrix[x0][y0-11]==2 || matrix[x0][y0-11]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-11]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i || matrix[x0+12][y0-5]==i)
+				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0-5]==2 || matrix[x0+12][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0-5]==i)
+				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		if (matrix[x0][y0-5]==2 || matrix[x0][y0-5]==3 || matrix[x0+6][y0-5]==2 || matrix[x0+6][y0-5]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0-5]==i || matrix[x0+6][y0-5]==i || matrix[x0+12][y0+1]==i)
+				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0-11]==2 || matrix[x0+6][y0-11]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-11]==i)
+				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		if (matrix[x0][y0+1]==2 || matrix[x0][y0+1]==3 || matrix[x0+6][y0+1]==2 || matrix[x0+6][y0+1]==3 || matrix[x0+12][y0+1]==2 || matrix[x0+12][y0+1]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+				temp = 1;
 	}
 	return temp;
 }
@@ -651,18 +688,21 @@ int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 	int temp = 0;
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3 || matrix[x0-1][y0-18]==2 || matrix[x0-1][y0-18]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i || matrix[x0-1][y0-18]==i)
+				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i)
+				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
@@ -671,78 +711,93 @@ int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0+5][y0-12]==2 || matrix[x0+5][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0+5][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0+5][y0-6]==2 || matrix[x0+5][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		if (matrix[x0+5][y0]==2 || matrix[x0+5][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0+11][y0-6]==2 || matrix[x0+11][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0+11][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		if (matrix[x0+5][y0]==2 || matrix[x0+5][y0]==3 || matrix[x0+5][y0-6]==2 || matrix[x0+5][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+5][y0]==i || matrix[x0+5][y0-6]==i || matrix[x0-1][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0+5][y0-6]==2 || matrix[x0+5][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		if (matrix[x0+5][y0]==2 || matrix[x0+5][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0+5][y0-12]==2 || matrix[x0+5][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0+5][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		if (matrix[x0+5][y0]==2 || matrix[x0+5][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0+5][y0-6]==2 || matrix[x0+5][y0-6]==3 || matrix[x0+5][y0-12]==2 || matrix[x0+5][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i || matrix[x0+5][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		if (matrix[x0+11][y0]==2 || matrix[x0+11][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+11][y0]==i || matrix[x0-1][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3 || matrix[x0-1][y0-12]==2 || matrix[x0-1][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		if (matrix[x0-1][y0]==2 || matrix[x0-1][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+				temp = 1;
 	}
 	return temp;
 }
@@ -751,98 +806,117 @@ int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloT
 	int temp = 0;
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-5]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+6][y0-6]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+6][y0-12]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+6][y0-18]==2 || matrix[x0+6][y0-18]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+6][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+6][y0-12]==i || matrix[x0+6][y0-18]==i)
+				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i)
+				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		if (matrix[x0+18][y0]==2 || matrix[x0+18][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+18][y0]==i || matrix[x0+12][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+12][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+6][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+18][y0-6]==2 || matrix[x0+18][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+18][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+6][y0-12]==2 || matrix[x0+6][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+6][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+6][y0-6]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+6][y0-12]==2 || matrix[x0+6][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+6][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		if (matrix[x0+18][y0]==2 || matrix[x0+18][y0]==3 || matrix[x0+18][y0-6]==2 || matrix[x0+18][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+18][y0]==i || matrix[x0+18][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+12][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+18][y0-6]==2 || matrix[x0+18][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+6][y0]==i || matrix[x0+18][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		if (matrix[x0+18][y0]==2 || matrix[x0+18][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+18][y0]==i || matrix[x0+12][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+18][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+18][y0-6]==2 || matrix[x0+18][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+18][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+6][y0-12]==2 || matrix[x0+6][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+6][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+6][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		if (matrix[x0+12][y0]==2 || matrix[x0+12][y0]==3 || matrix[x0+12][y0-6]==2 || matrix[x0+12][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+12][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		if (matrix[x0+18][y0]==2 || matrix[x0+18][y0]==3 || matrix[x0+18][y0-6]==2 || matrix[x0+18][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+18][y0]==i || matrix[x0+18][y0-6]==i)
+				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		if (matrix[x0+6][y0]==2 || matrix[x0+6][y0]==3 || matrix[x0+6][y0-6]==2 || matrix[x0+6][y0-6]==3 || matrix[x0+12][y0-12]==2 || matrix[x0+12][y0-12]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+6][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+12][y0-12]==i)
+				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		if (matrix[x0+18][y0]==2 || matrix[x0+18][y0]==3 || matrix[x0+6][y0-6]==2 || matrix[x0+6][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i<10; i++)
+			if (matrix[x0+18][y0]==i || matrix[x0+6][y0-6]==i)
+				temp = 1;
 	}
 	return temp;
 }
@@ -856,9 +930,10 @@ int checkLineFilled(uint16_t matrix[128][128]){
 	}
 	for(int i=0;i<127;i++){
 		for(int j=57;j<117;j++){
-			if (matrix[j][i]==3)
-				cRow[i] += 1;
-			}
+			for (int z = 2; z<10; z++)
+				if (matrix[j][i]==z)
+					cRow[i] += 1;
+				}
 		if (cRow[i]==60){
 			count++;
 			for(int j=57;j<117;j++){
@@ -877,23 +952,29 @@ int checkLineFilled(uint16_t matrix[128][128]){
 			}
 		}
 	}
-	if (count/6 == 1 || count/6 == 2 || count/6 == 3){
+	if (count/6 == 1){
 		temp = 100;
+	}
+	else if (count/6 == 2){
+		temp = 200;
+	}
+	else if (count/6 == 3){
+		temp = 300;
 	}
 	else if (count/6 == 4){
 		temp = 800;
 	}
-
 	return temp;
 }
 
 int checkGameOver(uint16_t matrix[128][128]){
 	int temp = 0;
 	for(int i=57;i<117;i++)
-		for(int j=127;j<128;j++){
-		if (matrix[j][i]==3){
-			temp=1;
-		}
+		for(int j=126;j<127;j++){
+			for (int z = 2; z<10; z++)
+				if (matrix[j][i]==z){
+					temp=1;
+				}
 	}
 	return temp;
 }
@@ -915,7 +996,7 @@ void createFrame(uint16_t matrix[128][128]){
 
 void createText(){
 	lcdPutS("Tetris", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-	lcdPutS("Level", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Time", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
@@ -964,197 +1045,520 @@ int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 	if (cisloTvaru == 1){
 		for(int i=0;i<24;i++)
 			for(int j=0;j<6;j++)
-				if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-					temp = 1;
+				for (int z = 2; z<10; z++)
+					if (matrix[x0+i][y0-j]==z)
+						temp = 1;
 	}
 	else if (cisloTvaru == 2){
 		for(int i=0;i<6;i++)
 			for(int j=0;j<24;j++)
-				if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-					temp = 1;
+				for (int z = 2; z<10; z++)
+					if (matrix[x0+i][y0-j]==z)
+						temp = 1;
 	}
 	else if (cisloTvaru == 3){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j>5 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && j<12)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j<12 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j>5 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && j<12)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j<12 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 4){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && i<12)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && i<12)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 5){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j>5 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && j<12)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j<12 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j>5 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && j<12)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j<12 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 6){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j>5 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j<6 && i<12)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j>5 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j<6 && i<12)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 7){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && i>11)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && i>11)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 8){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j<12 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>11)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<12 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>11)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 9){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 10){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j>5 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j>5 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 11){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if ((j>5 && j<12) && (i<6))
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if ((j>5 && j<12) && (i<6))
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 12){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6 && (i>5 && i<12))
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6 && (i>5 && i<12))
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 13){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if ((j>5 && j<12) && (i>5))
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if ((j>5 && j<12) && (i>5))
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 14){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && (i>5 && i<12))
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && (i>5 && i<12))
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 15){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6 && i>11)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6 && i>11)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 16){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j<12 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>11)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<12 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>11)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 17){
 		for(int i=0;i<18;i++)
 			for(int j=0;j<12;j++){
-				if (j<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && i<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && i<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 	else if (cisloTvaru == 18){
 		for(int i=0;i<12;i++)
 			for(int j=0;j<18;j++){
-				if (j<6)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
-				if (j>5 && i>5)
-					if (matrix[x0+i][y0-j]==2 || matrix[x0+i][y0-j]==3)
-						temp = 1;
+				for (int z = 2; z<10; z++){
+					if (j<6)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+					if (j>5 && i>5)
+						if (matrix[x0+i][y0-j]==z)
+							temp = 1;
+				}
 			}
 	}
 
 	return temp;
+}
+
+void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
+	// ak objekt je stvorec
+	if (cisloTvaru == 0){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<12;j++)
+				if (y0-j>1)
+					matrix[x0+i][y0-j]=3;
+	}
+	// ak objekt je obdlznik |
+	else if (cisloTvaru == 1){
+		for(int i=0;i<6;i++)
+			for(int j=0;j<24;j++)
+				if (y0-j>1)
+					matrix[x0+i][y0-j]=4;
+	}
+	// ak objekt je obdlznik _
+	else if (cisloTvaru == 2){
+		for(int i=0;i<24;i++)
+			for(int j=0;j<6;j++)
+				if (y0-j>1)
+					matrix[x0+i][y0-j]=4;
+	}
+	// ak objekt je Z
+	else if (cisloTvaru == 3){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6 && i>5)
+						matrix[x0+i][y0-j]=5;
+					if (j>5 && i<12)
+						matrix[x0+i][y0-j]=5;
+
+				}
+			}
+	}
+	// ak objekt je N
+	else if (cisloTvaru == 4){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j>5 && i>5)
+						matrix[x0+i][y0-j]=5;
+					if (j>5 && j<12)
+						matrix[x0+i][y0-j]=5;
+					if (j<12 && i<6)
+						matrix[x0+i][y0-j]=5;
+				}
+			}
+	}
+	// ak objekt je opaèný Z
+	else if (cisloTvaru == 5){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j>5 && i>5)
+						matrix[x0+i][y0-j]=6;
+					if (j<6 && i<12)
+						matrix[x0+i][y0-j]=6;
+				}
+			}
+	}
+	// ak objekt je opacny N
+	else if (cisloTvaru == 6){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j>5 && i<6)
+						matrix[x0+i][y0-j]=6;
+					if (j>5 && j<12)
+						matrix[x0+i][y0-j]=6;
+					if (j<12 && i>5)
+						matrix[x0+i][y0-j]=6;
+				}
+			}
+	}
+	// ak objekt je L
+	else if (cisloTvaru == 7){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j>5 && i<6)
+						matrix[x0+i][y0-j]=7;
+					if (j<6)
+						matrix[x0+i][y0-j]=7;
+				}
+			}
+	}
+	// ak objekt je _.
+	else if (cisloTvaru == 8){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6)
+						matrix[x0+i][y0-j]=7;
+					if (j>5 && i>11)
+						matrix[x0+i][y0-j]=7;
+				}
+			}
+	}
+	// ak objekt je '|
+	else if (cisloTvaru == 9){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j<12 && i>5)
+						matrix[x0+i][y0-j]=7;
+					if (j>11)
+						matrix[x0+i][y0-j]=7;
+				}
+			}
+	}
+	// ak objekt je ,..
+	else if (cisloTvaru == 10){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6 && i<6)
+						matrix[x0+i][y0-j]=7;
+					if (j>5)
+						matrix[x0+i][y0-j]=7;
+				}
+			}
+	}
+	// ak objekt je _._
+	else if (cisloTvaru == 11){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6)
+						matrix[x0+i][y0-j]=8;
+					if (j>5 && (i>5 && i<12))
+						matrix[x0+i][y0-j]=8;
+				}
+			}
+	}
+	// ak objekt je -|
+	else if (cisloTvaru == 12){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if ((j>5 && j<12) && (i<6))
+						matrix[x0+i][y0-j]=8;
+					if (i>5)
+						matrix[x0+i][y0-j]=8;
+				}
+			}
+	}
+	// ak objekt je ..,..
+	else if (cisloTvaru == 13){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6 && (i>5 && i<12))
+						matrix[x0+i][y0-j]=8;
+					if (j>5)
+						matrix[x0+i][y0-j]=8;
+				}
+			}
+	}
+	// ak objekt je |-
+	else if (cisloTvaru == 14){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (i<6)
+						matrix[x0+i][y0-j]=8;
+					if ((j>5 && j<12) && (i>5))
+						matrix[x0+i][y0-j]=8;
+				}
+			}
+	}
+	// ak objekt je opacny L
+	else if (cisloTvaru == 15){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j<6)
+						matrix[x0+i][y0-j]=9;
+					if (j>5 && i>5)
+						matrix[x0+i][y0-j]=9;
+				}
+			}
+	}
+	// ak objekt je ..,
+	else if (cisloTvaru == 16){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6 && i>11)
+						matrix[x0+i][y0-j]=9;
+					if (j>5)
+						matrix[x0+i][y0-j]=9;
+				}
+			}
+	}
+	// ak objekt je |'
+	else if (cisloTvaru == 17){
+		for(int i=0;i<12;i++)
+			for(int j=0;j<18;j++){
+				if (y0-j>1){
+					if (j<12 && i<6)
+						matrix[x0+i][y0-j]=9;
+					if (j>11)
+						matrix[x0+i][y0-j]=9;
+				}
+			}
+	}
+	// ak objekt je _.
+	else if (cisloTvaru == 18){
+		for(int i=0;i<18;i++)
+			for(int j=0;j<12;j++){
+				if (y0-j>1){
+					if (j<6)
+						matrix[x0+i][y0-j]=9;
+					if (j>5 && i<6)
+						matrix[x0+i][y0-j]=9;
+				}
+			}
+	}
+}
+
+int generateNumber(volatile int AD_value){
+	int cislo = AD_value%7;
+	int cisloTvaru = 0;
+	int temp = 0;
+
+	switch(cislo){
+		case 0:
+			cisloTvaru = 0;
+			break;
+		case 1:
+			temp = AD_value%2;
+			if (temp == 0)
+				cisloTvaru = 1;
+			else if (temp == 1)
+				cisloTvaru = 2;
+			break;
+		case 2:
+			temp = AD_value%2;
+			if (temp == 0)
+				cisloTvaru = 3;
+			else if (temp == 1)
+				cisloTvaru = 4;
+			break;
+		case 3:
+			temp = AD_value%2;
+			if (temp == 0)
+				cisloTvaru = 5;
+			else if (temp == 1)
+				cisloTvaru = 6;
+			break;
+		case 4:
+			temp = AD_value%4;
+			if (temp == 0)
+				cisloTvaru = 7;
+			else if (temp == 1)
+				cisloTvaru = 8;
+			else if (temp == 2)
+				cisloTvaru = 9;
+			else if (temp == 3)
+				cisloTvaru = 10;
+			break;
+		case 5:
+			temp = AD_value%4;
+			if (temp == 0)
+				cisloTvaru = 11;
+			else if (temp == 1)
+				cisloTvaru = 12;
+			else if (temp == 2)
+				cisloTvaru = 13;
+			else if (temp == 3)
+				cisloTvaru = 14;
+			break;
+		case 6:
+			temp = AD_value%4;
+			if (temp == 0)
+				cisloTvaru = 15;
+			else if (temp == 1)
+				cisloTvaru = 16;
+			else if (temp == 2)
+				cisloTvaru = 17;
+			else if (temp == 3)
+				cisloTvaru = 18;
+			break;
+	}
+
+	return cisloTvaru;
 }

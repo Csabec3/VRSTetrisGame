@@ -33,6 +33,7 @@
 #include "ili9163.h"
 #include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
 volatile int AD_value = 0;
 
@@ -662,10 +663,13 @@ int main(void)
   	}
   	count = 0; 				// pocitadlo
   	int cc=0;
+  	char time[10];
+  	int cisloTvaru;
+
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
 
-	int cisloTvaru = AD_value%19;
+	cisloTvaru = generateNumber(AD_value);
 
   /* Infinite loop */
   while (1)
@@ -673,7 +677,7 @@ int main(void)
 	  // v kazdom kroku aktualizuje maticu
 	  matrixPlot(matrix, cisloTvaru);
 	  // vymaze dany objekt
-	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
+	  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
 
 	  // v kazdom kroku posuva objekt smerom dole
 	  blockY[count] += yDir[count];
@@ -724,36 +728,30 @@ int main(void)
 		  // zastavi sa objekt
 		  yDir[count] = 0;
 		  // necha objekt na konecnom mieste
-		  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 3);
+		  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
 		  // GAME OVER
 		  /*if(checkGameOver(matrix)){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			  for(int i=57;i<117;i++)
+			  		for(int j=126;j<127;j++){
+			  			matrix[j][i]=3;
+			  		}
+			  /*lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 			  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 			  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 			  lcdPutS("Please press reset  to start over!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-			  break;
-		  }*/
+			  break;*/
+		  //}
 
 		  // vygenerujeme dalsi objekt
 		  count++;
-		  cisloTvaru = AD_value%19;
+		  cisloTvaru = generateNumber(AD_value);
+
 
 	  }
-
-
-
-
-
-
 	  // vykresli dany objekt
-	  createDeleteFixBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
-
+	  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 	  cc = 0;
-
-	  //Delay(1000);
-
-
   }
 
   return 0;

@@ -151,13 +151,15 @@ void adc_init(void);
 
 void createText();
 void createFrame(uint16_t matrix[128][128]);
-void createDeleteFixBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
+void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
+void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int rotateObject(int cisloTvaru);
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkLineFilled(uint16_t matrix[128][128]);
 int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int generateNumber(volatile int AD_value);
 
 int checkGameOver(uint16_t matrix[128][128]);
 #endif /* ILI9163LCD_H_ */
