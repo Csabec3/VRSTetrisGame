@@ -995,6 +995,7 @@ void createText(){
 	lcdPutS("Tetris", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 	lcdPutS("Lines", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Time", lcdTextX(1), lcdTextY(9), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){
@@ -1582,4 +1583,26 @@ int returnLines(int tempScore, int score){
 			break;
 	}
 	return lines;
+}
+
+void menu(volatile int AD_value, int volba){
+	lcdPutS("Tetris the GAME", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
+	switch(volba){
+		case 0:
+			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			break;
+		case 1:
+			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			break;
+		case 2:
+			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+			break;
+	}
+
 }

@@ -642,7 +642,7 @@ int main(void)
 	lcdInitialise(LCD_ORIENTATION0); // inicialiyuje LCD
 
 	lcdClearDisplay(decodeRgbValue(0, 0, 0));   	// vycisti obrazovku
-	createText();   	// vypis textov
+
 
   	// Parametre objektu
   	uint8_t blockX[1000]; 		// X-ova pozicia
@@ -658,103 +658,164 @@ int main(void)
 
   	//vytvorenie objektov
   	for (count = 0; count < 1000; count++){
-		blockX[count] = 87; 	// zaciatocna X-ova pozicia objektu
+		blockX[count] = 81; 	// zaciatocna X-ova pozicia objektu
 		blockY[count] = 0; 	// zaciatocna Y-ova pozicia objektu
 		xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
 		yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
   	}
   	count = 0; 				// pocitadlo
   	int cc=0;
+  	int cas = 0;
+  	int t = 0;
   	char time[10];
   	int cisloTvaru;
   	int tempScore=0;
+  	int run = 0;
+  	int highscore = 0;
+  	char alias = "Player1";
 
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
 
 	cisloTvaru = generateNumber(AD_value);
-
+	int volba =0;
   /* Infinite loop */
   while (1)
   {
-	  // v kazdom kroku aktualizuje maticu
-	  matrixPlot(matrix, cisloTvaru);
-	  // vymaze dany objekt
-	  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
-
-	  // v kazdom kroku posuva objekt smerom dole
-	  blockY[count] += yDir[count];
-
-	  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
-	  if ((AD_value>1700) && (AD_value<2300)){
-		  xDir[count] = 6;
-		  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-		  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
-			  xDir[count] = 0;
+	  if (run == 0){
+		  menu(AD_value, volba);
+		  if ((AD_value>1700) && (AD_value<2300)){
+			  volba+=1;
+			  if (volba > 2)
+				  volba = 0;
 		  }
-		  else
-			  blockX[count] -= xDir[count]; // dolava
-	  }
-	  else if ((AD_value>2500) && (AD_value<3100)){
-		  xDir[count] = 6;
-		  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-		  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
-			  xDir[count] = 0;
+		  else if ((AD_value>2500) && (AD_value<3100)){
+			  volba-=1;
+			  if (volba < 0)
+				  volba = 2;
 		  }
-		  else
-			  blockX[count] += xDir[count]; // doprava
-	  }
-	  // ak stlacime stvrte tlacidlo, otoci sa objekt
-	  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
-		  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
-			  cisloTvaru = rotateObject(cisloTvaru);
-		  	  cc=1;
-		  }
-	  }
-	  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
-	  else if ((AD_value>3300) && (AD_value<3450)){
-		  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
-			  blockY[count] += 0;
-		  else
-			  blockY[count] += 6;
-	  }
-
-	  // checkuje naplnene riadky
-	  tempScore = score;
-	  score += checkLineFilled(matrix);
-	  lines += returnLines(tempScore, score);
-	  // Vypise score
-	  sprintf(scoree, "%d", score);
-	  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	  sprintf(line, "%d", lines);
-	  lcdPutS(line, lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-	  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
-	  {
-		  // zastavi sa objekt
-		  yDir[count] = 0;
-		  // necha objekt na konecnom mieste
-		  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
-		  // GAME OVER
-		  if(checkGameOver(matrix, blockY[count], cisloTvaru)){
-			  matrixPlot(matrix, cisloTvaru);
+		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 0){
 			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-			  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-			  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-			  lcdPutS("Please press reset  to start over!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-			  break;
+			  run = 1;
 		  }
-		  // vygenerujeme dalsi objekt
-		  count++;
-		  cisloTvaru = generateNumber(AD_value);
+		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 1){
+			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			  run = 2;
+		  }
+		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 2){
+			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			  run = 3;
+		  }
 	  }
-	  // vykresli dany objekt
-	  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
-	  cc = 0;
+	  else if (run == 1){
+		  createText();   	// vypis textov
+	  		  cas++;
+			  if (cas == 2){
+				  t++;
+				  sprintf(time, "%d", t);
+				  lcdPutS(time, lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+				  cas = 0;
+			  }
+			  // v kazdom kroku aktualizuje maticu
+			  matrixPlot(matrix, cisloTvaru);
+			  // vymaze dany objekt
+			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
+
+			  // v kazdom kroku posuva objekt smerom dole
+			  blockY[count] += yDir[count];
+
+			  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
+			  if ((AD_value>1700) && (AD_value<2300)){
+				  xDir[count] = 6;
+				  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
+				  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
+					  xDir[count] = 0;
+				  }
+				  else
+					  blockX[count] -= xDir[count]; // dolava
+			  }
+			  else if ((AD_value>2500) && (AD_value<3100)){
+				  xDir[count] = 6;
+				  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
+				  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
+					  xDir[count] = 0;
+				  }
+				  else
+					  blockX[count] += xDir[count]; // doprava
+			  }
+			  // ak stlacime stvrte tlacidlo, otoci sa objekt
+			  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
+				  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
+					  cisloTvaru = rotateObject(cisloTvaru);
+					  cc=1;
+				  }
+			  }
+			  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
+			  else if ((AD_value>3300) && (AD_value<3450)){
+				  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
+					  blockY[count] += 0;
+				  else
+					  blockY[count] += 6;
+			  }
+
+			  // checkuje naplnene riadky
+			  tempScore = score;
+			  score += checkLineFilled(matrix);
+			  lines += returnLines(tempScore, score);
+			  // Vypise score
+			  sprintf(scoree, "%d", score);
+			  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+			  sprintf(line, "%d", lines);
+			  lcdPutS(line, lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+			  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
+			  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
+			  {
+				  // zastavi sa objekt
+				  yDir[count] = 0;
+				  // necha objekt na konecnom mieste
+				  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
+				  // GAME OVER
+				  if(checkGameOver(matrix, blockY[count], cisloTvaru)){
+					  matrixPlot(matrix, cisloTvaru);
+					  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+					  run = 4;
+				  }
+				  // vygenerujeme dalsi objekt
+				  count++;
+				  cisloTvaru = generateNumber(AD_value);
+			  }
+			  // vykresli dany objekt
+			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+			  cc = 0;
+	  }
+	  else if (run == 4){
+		  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
+		  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+		  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+		  lcdPutS("Press any key to return to the menu!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+		  if (highscore < score)
+			  highscore = score;
+		  if ((AD_value>1700) && (AD_value<3650)){
+			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			  score = 0;
+			  t=0;
+			  lines = 0;
+			  cas = 0;
+			  run = 0;
+				for (count = 0; count < 1000; count++){
+					blockX[count] = 81; 	// zaciatocna X-ova pozicia objektu
+					blockY[count] = 0; 	// zaciatocna Y-ova pozicia objektu
+					xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
+					yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
+				}
+			  count = 0;
+			  createFrame(matrix);
+		  }
+	  }
   }
+
 
   return 0;
 }
