@@ -149,7 +149,7 @@ void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16
 void startupNVIC();
 void adc_init(void);
 
-void createText();
+void createText(char alias[7]);
 void createFrame(uint16_t matrix[128][128]);
 void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
 void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
@@ -163,5 +163,6 @@ int generateNumber(volatile int AD_value);
 int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru);
 int returnLines(int tempScore, int score);
 void menu(volatile int AD_value, int volba);
+void showHighscore(int highscore[], char* names[]);
 
 #endif /* ILI9163LCD_H_ */

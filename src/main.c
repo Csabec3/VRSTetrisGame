@@ -27,13 +27,14 @@
 /* Includes */
 #include <stddef.h>
 #include "stm32l1xx.h"
-//#include <stdio.h>
 #include "spi.h"
 #include "ssd1306.h"
 #include "ili9163.h"
 #include <time.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <stdio.h>
 
 volatile int AD_value = 0;
 
@@ -671,9 +672,9 @@ int main(void)
   	int cisloTvaru;
   	int tempScore=0;
   	int run = 0;
-  	int highscore = 0;
-  	char alias = "Player1";
-
+  	int highscore[] = {5000, 4000, 3000, 2000, 1000};
+  	char* names[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
+  	char alias[7] = "Player1";
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
 
@@ -682,7 +683,7 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	  if (run == 0){
+	  if (run == 0){ // menu
 		  menu(AD_value, volba);
 		  if ((AD_value>1700) && (AD_value<2300)){
 			  volba+=1;
@@ -707,8 +708,8 @@ int main(void)
 			  run = 3;
 		  }
 	  }
-	  else if (run == 1){
-		  createText();   	// vypis textov
+	  else if (run == 1){ // play
+		  createText(alias);   	// vypis textov
 	  		  cas++;
 			  if (cas == 2){
 				  t++;
@@ -790,13 +791,40 @@ int main(void)
 			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 			  cc = 0;
 	  }
-	  else if (run == 4){
+	  else if (run == 3){ // high score
+		  showHighscore(highscore, names);
+		  if ((AD_value>1700) && (AD_value<3650)){
+			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			  run = 0;
+		  }
+	  }
+	  else if (run == 4){ // game over
 		  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 		  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 		  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 		  lcdPutS("Press any key to return to the menu!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-		  if (highscore < score)
-			  highscore = score;
+		  if (score >= highscore[0]){
+			  highscore[0]=score;
+			  names[0] = alias;
+		  }
+		  else if (score < highscore[0]  && score >= highscore[1]){
+			  highscore[1] = score;
+			  names[1] = alias;
+		  }
+		  else if (score < highscore[1]  && score >= highscore[2]){
+			  highscore[2] = score;
+			  names[2] = alias;
+		  }
+		  else if (score < highscore[2]  && score >= highscore[3]){
+			  highscore[3] = score;
+			  names[3] = alias;
+		  }
+		  else if (score < highscore[3]  && score >= highscore[4]){
+			  highscore[4] = score;
+			  names[4] = alias;
+		  }
+
+
 		  if ((AD_value>1700) && (AD_value<3650)){
 			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			  score = 0;

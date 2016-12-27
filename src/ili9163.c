@@ -31,6 +31,7 @@
 #include "spi.h"
 #include "ssd1306.h"
 #include "stm32l1xx.h"
+#include <stdio.h>
 
 uint16_t matrix_pom[128][128];
 // Low-level LCD driving functions --------------------------------------------------------------------------
@@ -991,8 +992,8 @@ void createFrame(uint16_t matrix[128][128]){
 	}
 }
 
-void createText(){
-	lcdPutS("Tetris", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
+void createText(char alias[7]){
+	lcdPutS(alias, lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
 	lcdPutS("Lines", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Time", lcdTextX(1), lcdTextY(9), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
@@ -1605,4 +1606,39 @@ void menu(volatile int AD_value, int volba){
 			break;
 	}
 
+}
+
+void showHighscore(int highscore[], char* names[]){
+	char hScore1[6];
+	char hScore2[6];
+	char hScore3[6];
+	char hScore4[6];
+	char hScore5[6];
+
+	lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("1.", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(names[0], lcdTextX(4), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(":", lcdTextX(12), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	sprintf(hScore1, "%d", highscore[0]);
+	lcdPutS(hScore1, lcdTextX(14), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("2.", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(names[1], lcdTextX(4), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(":", lcdTextX(12), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	sprintf(hScore2, "%d", highscore[1]);
+	lcdPutS(hScore2, lcdTextX(14), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("3.", lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(names[2], lcdTextX(4), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(":", lcdTextX(12), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	sprintf(hScore3, "%d", highscore[2]);
+	lcdPutS(hScore3, lcdTextX(14), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("4.", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(names[3], lcdTextX(4), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(":", lcdTextX(12), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	sprintf(hScore4, "%d", highscore[3]);
+	lcdPutS(hScore4, lcdTextX(14), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("5.", lcdTextX(1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(names[4], lcdTextX(4), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS(":", lcdTextX(12), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	sprintf(hScore5, "%d", highscore[4]);
+	lcdPutS(hScore5, lcdTextX(14), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
