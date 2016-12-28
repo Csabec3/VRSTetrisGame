@@ -1588,92 +1588,171 @@ int returnLines(int tempScore, int score){
 	return lines;
 }
 
-void menu(volatile int AD_value, int volba, char* menuVolba[]){
+// Funkcia vykresli startovaciu obrazovku a riadi pohyb medzi volbami
+void drawMenu(volatile int AD_value, int volba, char* menuVolba[]){
 	lcdPutS(".TETRIS.", lcdTextX(7), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
 	lcdPutS("THE STM32 GAME", lcdTextX(4), lcdTextY(4), decodeRgbValue(15, 31, 0), decodeRgbValue(0, 0, 0));
-	int x=0;
-	int j=1;
+	int x = 0;
+	int j = 1;
 
-	for (int i=0; i<3; i++){
-		if (i==0)
-			x=7;
+	for (int i = 0; i < 3; i++){
+		if (i == 0)
+			x = 7;
 		else if (i == 1)
-			x=4;
+			x = 4;
 		else if (i == 2)
-			x=6;
-
-
-		if(i==volba)
+			x = 6;
+		if(i == volba)
 			lcdPutS(menuVolba[i], lcdTextX(x), lcdTextY(i+7+j), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
 		else
 			lcdPutS(menuVolba[i], lcdTextX(x), lcdTextY(i+7+j), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 		j++;
 	}
-
-
 }
 
-void showHighscore(int highscore[], char* names[]){
-	char hScore1[6];
-	char hScore2[6];
-	char hScore3[6];
-	char hScore4[6];
-	char hScore5[6];
-
-	for (int i=0; i<7;i++){
-		lcdPutCh(names[0][i], lcdTextX(i+4), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[1][i], lcdTextX(i+4), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[2][i], lcdTextX(i+4), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[3][i], lcdTextX(i+4), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[4][i], lcdTextX(i+4), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+// Funkcia vrati hodnotu vybranej volby
+int returnVolba(volatile int AD_value, int volba){
+	if ((AD_value > 1700) && (AD_value < 2300)){
+		volba += 1;
+		if (volba > 2)
+			volba = 0;
 	}
-	lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("1.", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS(":", lcdTextX(12), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	sprintf(hScore1, "%d", highscore[0]);
-	lcdPutS(hScore1, lcdTextX(14), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("2.", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS(":", lcdTextX(12), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	sprintf(hScore2, "%d", highscore[1]);
-	lcdPutS(hScore2, lcdTextX(14), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("3.", lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS(":", lcdTextX(12), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	sprintf(hScore3, "%d", highscore[2]);
-	lcdPutS(hScore3, lcdTextX(14), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("4.", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS(":", lcdTextX(12), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	sprintf(hScore4, "%d", highscore[3]);
-	lcdPutS(hScore4, lcdTextX(14), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("5.", lcdTextX(1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
-	lcdPutS(":", lcdTextX(12), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	sprintf(hScore5, "%d", highscore[4]);
-	lcdPutS(hScore5, lcdTextX(14), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	else if ((AD_value > 2500) && (AD_value < 3100)){
+		volba -= 1;
+		if (volba < 0)
+			volba = 2;
+	}
+	return volba;
 }
 
-void setName(int abcVolba, char* abc[]){
+// Funkcia vrati hodnotu dalsieho vybranej okna
+int returnRun(volatile int AD_value, int volba, int run){
+	if (((AD_value > 3300) && (AD_value < 3650)) && volba == 0){
+		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		run = 1;
+	}
+	else if (((AD_value > 3300) && (AD_value < 3650)) && volba == 1){
+		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		run = 2;
+	}
+	else if (((AD_value > 3300) && (AD_value < 3650)) && volba == 2){
+		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		run = 3;
+	}
+	return run;
+}
+
+// Funkcia vykresli poradie, nazvy a score najlepsich hracov
+void showHighscore(int highscore[], char* names[]){
+	char hScore[6];
+	int j = 5;
+
+	for (int i = 0; i < 7; i++){
+		lcdPutCh(names[0][i], lcdTextX(i+6), lcdTextY(5), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[1][i], lcdTextX(i+6), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[2][i], lcdTextX(i+6), lcdTextY(9), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[3][i], lcdTextX(i+6), lcdTextY(11), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[4][i], lcdTextX(i+6), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		if (i < 5){
+			sprintf(hScore, "%d", highscore[i]);
+			lcdPutS(hScore, lcdTextX(15), lcdTextY(j), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+			lcdPutS(":", lcdTextX(14), lcdTextY(j), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			j = j + 2;
+		}
+	}
+	lcdPutS("HIGHSCORE", lcdTextX(6), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	lcdPutS("1.", lcdTextX(3), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("2.", lcdTextX(3), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("3.", lcdTextX(3), lcdTextY(9), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("4.", lcdTextX(3), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("5.", lcdTextX(3), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("BACK", lcdTextX(1), lcdTextY(15), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
+}
+
+// Funkcia prepne hodnotu run na 0 ak je stlacene hociktore tlacidlo
+int goBack(volatile int AD_value, int run){
+	if ((AD_value > 1700) && (AD_value < 3650)){
+		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		run = 0;
+	}
+	return run;
+}
+
+// Funkcia vypise na obrazovku ABC a umoznuje prepnut medzi nimi
+void drawABC(int abcVolba, char* abc[]){
 	int k = 2;
 	int y = 4;
-	lcdPutS("Choose characters", lcdTextX(2), lcdTextY(1), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	for(int i=0; i<29; i++){
-		if (k<17 && y<10){
-			k=k+2;
+	lcdPutS("PICK CHARACTERS", lcdTextX(3), lcdTextY(1), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	for(int i = 0; i < 29; i++){
+		if (k < 17 && y < 10){
+			k = k + 2;
 		}
-		else if (k>16 && y<10){
-			y=y+2;
-			k=2;
+		else if (k > 16 && y < 10){
+			y = y + 2;
+			k = 2;
 		}
-		else if (k<17 && y>9){
-			k=k+7;
+		else if (k < 17 && y > 9){
+			k = k + 7;
 		}
-		if (i==abcVolba)
-			lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+		if (i == abcVolba)
+			if (y > 9)
+				lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(31, 0, 0), decodeRgbValue(10, 31, 10));
+			else
+				lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
 		else
-			lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			if (y > 9)
+				lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+			else
+				lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	}
+}
 
+// Funkcia vrati hodnotu ABC volby
+int returnAbcVolba(volatile int AD_value, int abcVolba){
+	if ((AD_value > 1700) && (AD_value < 2300)){
+		abcVolba += 1;
+		if (abcVolba > 28)
+			abcVolba = 0;
+	}
+	else if ((AD_value > 2500) && (AD_value < 3100)){
+		abcVolba -= 1;
+		if (abcVolba < 0)
+			abcVolba = 28;
+	}
+	return abcVolba;
+}
+
+// Funkcia vymeni meno hraca alebo vrati naspat do menu
+void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], char abc2[], int *run, char alias[7]){
+	if ((AD_value > 3300) && (AD_value < 3650)){
+		if (abcVolba < 26 && *index < 7){
+			newAlias[*index] = abc2[abcVolba];
+			lcdPutCh(newAlias[*index], lcdTextX(*index + 7), lcdTextY(12), decodeRgbValue(31, 31, 0), decodeRgbValue(0, 0, 0));
+			*index = *index + 1;
+		}
+		else if (abcVolba < 26 && *index > 6){
+			lcdPutS("MAX 7 CHARS!!!", lcdTextX(4), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		}
+		else if (abcVolba == 26){
+			*index = 0;
+			lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			*run = 0;
+		}
+		else if (abcVolba == 27){
+			*index = *index - 1;
+			newAlias[*index] = ' ';
+			lcdPutCh(newAlias[*index], lcdTextX(*index + 1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS("MAX 7 CHARS!!!", lcdTextX(2), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+		}
+		else if (abcVolba == 28){
+			for (int i = 0; i < 7; i++)
+				if (newAlias[i] == ' ')
+					alias[i] = ' ';
+				else
+					alias[i] = newAlias[i];
+			lcdClearDisplay(decodeRgbValue(0, 0, 0));
+			*index = 0;
+			*run = 0;
+		}
+	}
 }

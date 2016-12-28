@@ -690,30 +690,11 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	  if (run == 0){ // menu
-		  menu(AD_value, volba, menuVolba);
-		  if ((AD_value>1700) && (AD_value<2300)){
-			  volba+=1;
-			  if (volba > 2)
-				  volba = 0;
-		  }
-		  else if ((AD_value>2500) && (AD_value<3100)){
-			  volba-=1;
-			  if (volba < 0)
-				  volba = 2;
-		  }
-		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 0){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  run = 1;
-		  }
-		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 1){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  run = 2;
-		  }
-		  else if (((AD_value>3300) && (AD_value<3650)) && volba == 2){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  run = 3;
-		  }
+	  // Hlavne okno
+	  if (run == 0){
+		  drawMenu(AD_value, volba, menuVolba); 	// vypise texty a umoznuje pohyb medzi volbami
+		  volba = returnVolba(AD_value, volba);		// vrati hodnotu vybranej volby
+		  run = returnRun(AD_value, volba, run);	// vrati volbu dalsieho okna
 	  }
 	  else if (run == 1){ // play
 		  createText(alias);   	// vypis textov
@@ -798,57 +779,16 @@ int main(void)
 			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 			  cc = 0;
 	  }
-	  else if (run == 2){ // alias
-		  setName(abcVolba, abc);
-		  if ((AD_value>1700) && (AD_value<2300)){
-			  abcVolba+=1;
-			  if (abcVolba > 28)
-				  abcVolba = 0;
-		  }
-		  else if ((AD_value>2500) && (AD_value<3100)){
-			  abcVolba-=1;
-			  if (abcVolba < 0)
-				  abcVolba = 28;
-		  }
-		  else if ((AD_value>3300) && (AD_value<3650)){
-			  if (abcVolba < 26 && index < 7){
-				  newAlias[index]=abc2[abcVolba];
-				  lcdPutCh(newAlias[index], lcdTextX(index+1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-				  index++;
-			  }
-			  else if (abcVolba < 26 && index > 6){
-				  lcdPutS("No more space!", lcdTextX(2), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			  }
-			  else if (abcVolba == 26){
-				  index = 0;
-				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-				  run = 0;
-			  }
-			  else if (abcVolba == 27){
-				  index--;
-				  newAlias[index]=' ';
-				  lcdPutCh(newAlias[index], lcdTextX(index+1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-				  lcdPutS("No more space!", lcdTextX(2), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
-			  }
-			  else if (abcVolba == 28){
-				  for (int v=0; v<7; v++)
-					  if (newAlias[v] == ' ')
-						  alias[v] = ' ';
-					  else
-						  alias[v] = newAlias[v];
-				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-				  index = 0;
-				  run = 0;
-			  }
-
-		  }
+	  // Change my name
+	  else if (run == 2){
+		  drawABC(abcVolba, abc);
+		  abcVolba = returnAbcVolba(AD_value, abcVolba);
+		  changeName(AD_value, abcVolba, &index, newAlias, abc2, &run, alias);
 	  }
-	  else if (run == 3){ // high score
+	  // High score
+	  else if (run == 3){
 		  showHighscore(highscore, names);
-		  if ((AD_value>1700) && (AD_value<3650)){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  run = 0;
-		  }
+		  run = goBack(AD_value, run);
 	  }
 	  else if (run == 4){ // game over
 		  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
