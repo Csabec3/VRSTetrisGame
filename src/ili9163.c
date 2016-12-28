@@ -1589,14 +1589,24 @@ int returnLines(int tempScore, int score){
 }
 
 void menu(volatile int AD_value, int volba, char* menuVolba[]){
-	lcdPutS("TETRIS", lcdTextX(8), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
-	lcdPutS("THE RETRO GAME", lcdTextX(2), lcdTextY(4), decodeRgbValue(15, 31, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(".TETRIS.", lcdTextX(7), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	lcdPutS("THE STM32 GAME", lcdTextX(4), lcdTextY(4), decodeRgbValue(15, 31, 0), decodeRgbValue(0, 0, 0));
+	int x=0;
 	int j=1;
+
 	for (int i=0; i<3; i++){
+		if (i==0)
+			x=7;
+		else if (i == 1)
+			x=4;
+		else if (i == 2)
+			x=6;
+
+
 		if(i==volba)
-			lcdPutS(menuVolba[i], lcdTextX(1), lcdTextY(i+7+j), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+			lcdPutS(menuVolba[i], lcdTextX(x), lcdTextY(i+7+j), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
 		else
-			lcdPutS(menuVolba[i], lcdTextX(1), lcdTextY(i+7+j), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutS(menuVolba[i], lcdTextX(x), lcdTextY(i+7+j), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 		j++;
 	}
 
