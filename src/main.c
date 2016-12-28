@@ -645,7 +645,7 @@ int main(void)
 
   	// Parametre objektu
   	uint8_t blockX[1000], blockY[1000], xDir[1000], yDir[1000];
-  	int lines = 0, cc = 0, tt = 0, tempScore = 0, tempApm = 0, apm = 0, run = 0, abcVolba = 0, index = 0, volba = 0, cisloTvaru = 0, count = 0, score = 200;
+  	int lines = 0, cc = 0, tt = 0, tempScore = 0, tempApm = 0, apm = 0, run = 0, abcVolba = 0, index = 0, volba = 0, cisloTvaru = 0, count = 0, score = 0;
   	char time[7], pm[7], scoree[7], line[7], tempPm[7];
   	uint16_t matrix[128][128];	// matica hry
   	float t = 0;
@@ -688,42 +688,7 @@ int main(void)
 		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
 		  // v kazdom kroku posuva objekt smerom dole
 		  blockY[count] += yDir[count];
-
-		  //buttonPressed(AD_value, );
-		  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
-		  if ((AD_value>1700) && (AD_value<2300)){
-			  xDir[count] = 6;
-			  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-			  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
-				  xDir[count] = 0;
-			  }
-			  else
-				  blockX[count] -= xDir[count]; // dolava
-		  }
-		  else if ((AD_value>2500) && (AD_value<3100)){
-			  xDir[count] = 6;
-			  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-			  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
-				  xDir[count] = 0;
-			  }
-			  else
-				  blockX[count] += xDir[count]; // doprava
-		  }
-		  // ak stlacime stvrte tlacidlo, otoci sa objekt
-		  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
-			  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
-				  cisloTvaru = rotateObject(cisloTvaru);
-				  cc=1;
-			  }
-		  }
-		  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
-		  else if ((AD_value>3300) && (AD_value<3450)){
-			  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
-				  blockY[count] += 0;
-			  else
-				  blockY[count] += 6;
-		  }
-
+		  buttonPressed(AD_value, &xDir[count], matrix, &blockX[count], &blockY[count], &cisloTvaru, &cc);
 		  // checkuje naplnene riadky
 		  tempScore = score;
 		  score += checkLineFilled(matrix);
@@ -731,15 +696,15 @@ int main(void)
 		  // Vypise score
 		  sprintf(scoree, "%d", score);
 		  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
+		  // Vypise odstranene riadky
 		  sprintf(line, "%d", lines);
 		  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
+		  // Vypise cas
 		  t=t+0.8;
 		  tt=t;
 		  sprintf(time, "%d", tt);
 		  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-
+		  // Vypise score/min
 		  tempApm = apm;
 		  apm = score/tt;
 		  sprintf(pm, "%d", apm);
@@ -748,26 +713,9 @@ int main(void)
 			  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
 		  }
 		  lcdPutS(pm, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  // Checkuje prekazku a Game over
+		  checkObstacleAndGameOver(matrix, &blockX[count], &blockY[count], &cisloTvaru, &yDir[count], &run, &count, AD_value);
 
-		  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-		  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
-		  {
-			  // zastavi sa objekt
-			  yDir[count] = 0;
-			  // necha objekt na konecnom mieste
-			  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
-			  // GAME OVER
-			  if(checkGameOver(matrix,blockX[count],blockY[count], cisloTvaru)){
-				  matrixPlot(matrix, cisloTvaru);
-				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-				  run = 4;
-			  }
-			  // vygenerujeme dalsi objekt
-			  count++;
-			  if (count > 999)
-				  run = 4;
-			  cisloTvaru = generateNumber(AD_value);
-		  }
 		  // vykresli dany objekt
 		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 		  cc = 0;

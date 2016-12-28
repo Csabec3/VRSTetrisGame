@@ -1808,3 +1808,61 @@ void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm
 		createFrame(matrix);
 	}
 }
+
+// Funkcia riadi jednotlive klavesy
+void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *cc){
+	// ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
+	if ((AD_value > 1700) && (AD_value < 2300)){
+		*xDir = 6;
+		// v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
+		if (checkLeftSide(matrix, *blockX, *blockY, *cisloTvaru))
+		  *xDir = 0;
+		else
+		  *blockX -= *xDir; // dolava
+	}
+	else if ((AD_value > 2500) && (AD_value < 3100)){
+		*xDir = 6;
+		// v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
+		if (checkRightSide(matrix, *blockX, *blockY, *cisloTvaru))
+			*xDir = 0;
+		else
+			*blockX += *xDir; // doprava
+	}
+	// ak stlacime stvrte tlacidlo, otoci sa objekt
+	else if ((AD_value > 3520) && (AD_value < 3650) && *cc == 0){
+		if (!checkRotation(matrix, *blockX, *blockY, *cisloTvaru)){
+			*cisloTvaru = rotateObject(*cisloTvaru);
+			*cc=1;
+		}
+	}
+	// ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
+	else if ((AD_value > 3300) && (AD_value < 3450)){
+		if (checkBlockade(matrix, *blockX, *blockY+12, *cisloTvaru))
+			*blockY += 0;
+		else
+			*blockY += 6;
+	}
+}
+
+// Funkcia checkuje ci sa nenachadza objekt pred danym tvarom a checkuje ci sa nenastane koniec hry
+void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *count, volatile int AD_value){
+	// v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
+	if (checkBlockade(matrix, *blockX, *blockY, *cisloTvaru))
+	{
+	  // zastavi sa objekt
+	  *yDir = 0;
+	  // necha objekt na konecnom mieste
+	  placeDownBlock(matrix, *blockX, *blockY, *cisloTvaru);
+	  // GAME OVER
+	  if(checkGameOver(matrix, *blockX, *blockY, *cisloTvaru)){
+		  matrixPlot(matrix, *cisloTvaru);
+		  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		  *run = 4;
+	  }
+	  // vygenerujeme dalsi objekt
+	  *count = *count + 1;
+	  if (*count > 999)
+		  *run = 4;
+	  *cisloTvaru = generateNumber(AD_value);
+	}
+}
