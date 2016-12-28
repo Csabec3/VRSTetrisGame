@@ -375,7 +375,6 @@ void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int ci
 						matrix[x0+i][y0-j]=volba;
 					if (j>5 && i<12)
 						matrix[x0+i][y0-j]=volba;
-
 				}
 			}
 	}
@@ -968,11 +967,12 @@ int checkLineFilled(uint16_t matrix[128][128]){
 	return temp;
 }
 
-int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru){
+int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
 	for (int i=0; i<19; i++)
 		if (i!=2)
-			if ((cisloTvaru == i) && (y0-6)==0)
+			for (int j=2; j<10; j++)
+			if ((cisloTvaru == i) && (y0-6)==0 && (matrix[x0][y0+1]==j))
 				temp=1;
 	return temp;
 }
@@ -999,6 +999,7 @@ void createText(char alias[7]){
 	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Apm:", lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){
@@ -1501,64 +1502,61 @@ int generateNumber(volatile int AD_value){
 	int cisloTvaru = 0;
 	int temp = 0;
 
-	switch(cislo){
-		case 0:
-			cisloTvaru = 0;
-			break;
-		case 1:
-			temp = AD_value%2;
-			if (temp == 0)
-				cisloTvaru = 1;
-			else if (temp == 1)
-				cisloTvaru = 2;
-			break;
-		case 2:
-			temp = AD_value%2;
-			if (temp == 0)
-				cisloTvaru = 3;
-			else if (temp == 1)
-				cisloTvaru = 4;
-			break;
-		case 3:
-			temp = AD_value%2;
-			if (temp == 0)
-				cisloTvaru = 5;
-			else if (temp == 1)
-				cisloTvaru = 6;
-			break;
-		case 4:
-			temp = AD_value%4;
-			if (temp == 0)
-				cisloTvaru = 7;
-			else if (temp == 1)
-				cisloTvaru = 8;
-			else if (temp == 2)
-				cisloTvaru = 9;
-			else if (temp == 3)
-				cisloTvaru = 10;
-			break;
-		case 5:
-			temp = AD_value%4;
-			if (temp == 0)
-				cisloTvaru = 11;
-			else if (temp == 1)
-				cisloTvaru = 12;
-			else if (temp == 2)
-				cisloTvaru = 13;
-			else if (temp == 3)
-				cisloTvaru = 14;
-			break;
-		case 6:
-			temp = AD_value%4;
-			if (temp == 0)
-				cisloTvaru = 15;
-			else if (temp == 1)
-				cisloTvaru = 16;
-			else if (temp == 2)
-				cisloTvaru = 17;
-			else if (temp == 3)
-				cisloTvaru = 18;
-			break;
+	if (cislo == 0)
+		cisloTvaru = 0;
+	else if (cislo == 1){
+		temp = AD_value%2;
+		if (temp == 0)
+			cisloTvaru = 1;
+		else if (temp == 1)
+			cisloTvaru = 2;
+	}
+	else if (cislo == 2){
+		temp = AD_value%2;
+		if (temp == 0)
+			cisloTvaru = 3;
+		else if (temp == 1)
+			cisloTvaru = 4;
+	}
+	else if (cislo == 3){
+		temp = AD_value%2;
+		if (temp == 0)
+			cisloTvaru = 5;
+		else if (temp == 1)
+			cisloTvaru = 6;
+	}
+	else if (cislo == 4){
+		temp = AD_value%4;
+		if (temp == 0)
+			cisloTvaru = 7;
+		else if (temp == 1)
+			cisloTvaru = 8;
+		else if (temp == 2)
+			cisloTvaru = 9;
+		else if (temp == 3)
+			cisloTvaru = 10;
+	}
+	else if (cislo == 5){
+		temp = AD_value%4;
+		if (temp == 0)
+			cisloTvaru = 11;
+		else if (temp == 1)
+			cisloTvaru = 12;
+		else if (temp == 2)
+			cisloTvaru = 13;
+		else if (temp == 3)
+			cisloTvaru = 14;
+	}
+	else if (cislo == 6){
+		temp = AD_value%4;
+		if (temp == 0)
+			cisloTvaru = 15;
+		else if (temp == 1)
+			cisloTvaru = 16;
+		else if (temp == 2)
+			cisloTvaru = 17;
+		else if (temp == 3)
+			cisloTvaru = 18;
 	}
 
 	return cisloTvaru;
@@ -1742,7 +1740,7 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 			*index = *index - 1;
 			newAlias[*index] = ' ';
 			lcdPutCh(newAlias[*index], lcdTextX(*index + 1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			lcdPutS("MAX 7 CHARS!!!", lcdTextX(2), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+			lcdPutS("MAX 7 CHARS!!!", lcdTextX(4), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
 		}
 		else if (abcVolba == 28){
 			for (int i = 0; i < 7; i++)
@@ -1754,5 +1752,59 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 			*index = 0;
 			*run = 0;
 		}
+	}
+}
+
+// Funkcia vykresli text na obraze game over
+void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]){
+	if (score >= highscore[0]){
+		highscore[0] = score;
+		names[0] = alias;
+	}
+	else if (score < highscore[0]  && score >= highscore[1]){
+		highscore[1] = score;
+		names[1] = alias;
+	}
+	else if (score < highscore[1]  && score >= highscore[2]){
+		highscore[2] = score;
+		names[2] = alias;
+	}
+	else if (score < highscore[2]  && score >= highscore[3]){
+		highscore[3] = score;
+		names[3] = alias;
+	}
+	else if (score < highscore[3]  && score >= highscore[4]){
+		highscore[4] = score;
+		names[4] = alias;
+	}
+	lcdPutS("Game Over!", lcdTextX(6), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	lcdPutS("Chin up", lcdTextX(4), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS(alias, lcdTextX(12), lcdTextY(6), decodeRgbValue(31, 31, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("Your score :", lcdTextX(2), lcdTextY(8), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(scoree, lcdTextX(15), lcdTextY(8), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("Your time  :", lcdTextX(2), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(time, lcdTextX(15), lcdTextY(10), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("Your p/m   :", lcdTextX(2), lcdTextY(12), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(pm, lcdTextX(15), lcdTextY(12), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("BACK", lcdTextX(1), lcdTextY(15), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
+}
+
+// Funkcia resetuje parametre pre novu hru
+void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]){
+	if ((AD_value > 1700) && (AD_value < 3650)){
+		lcdClearDisplay(decodeRgbValue(0, 0, 0));
+		*score = 0;
+		*t = 0;
+		*lines = 0;
+		*apm = 0;
+		*run = 0;
+		for (int i = 0; i < 1000; i++){
+			blockX[i] = 81;
+			blockY[i] = 0;
+			xDir[i] = 6;
+			yDir[i] = 6;
+		}
+		*count = 0;
+		createFrame(matrix);
 	}
 }

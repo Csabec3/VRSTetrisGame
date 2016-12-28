@@ -641,52 +641,34 @@ int main(void)
 	initCS_Pin();
 	initRES_Pin();
 	lcdInitialise(LCD_ORIENTATION0); // inicialiyuje LCD
-
 	lcdClearDisplay(decodeRgbValue(0, 0, 0));   	// vycisti obrazovku
 
-
   	// Parametre objektu
-  	uint8_t blockX[1000]; 		// X-ova pozicia
-  	uint8_t blockY[1000]; 		// Y-ova pozicia
-  	uint8_t xDir[1000];  		// velkost kroku na X-ovej osi
-  	uint8_t yDir[1000];			// velkost kroku na Y-ovej osi
-  	int count;					// pocitadlo objektu
-  	int score = 0;				// score v tvare int
-  	char scoree[8];				// score v tvare string
-  	int lines = 0;
-  	char line[10];
+  	uint8_t blockX[1000], blockY[1000], xDir[1000], yDir[1000];
+  	int lines = 0, cc = 0, tt = 0, tempScore = 0, tempApm = 0, apm = 0, run = 0, abcVolba = 0, index = 0, volba = 0, cisloTvaru = 0, count = 0, score = 200;
+  	char time[7], pm[7], scoree[7], line[7], tempPm[7];
   	uint16_t matrix[128][128];	// matica hry
-
-  	//vytvorenie objektov
-  	for (count = 0; count < 1000; count++){
-		blockX[count] = 81; 	// zaciatocna X-ova pozicia objektu
-		blockY[count] = 0; 	// zaciatocna Y-ova pozicia objektu
-		xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
-		yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
-  	}
-  	count = 0; 				// pocitadlo
-  	int cc=0;
-  	int cas = 0;
-  	int t = 0;
-  	char time[10];
-  	int cisloTvaru;
-  	int tempScore=0;
-  	int run = 0;
-  	int highscore[] = {500, 400, 300, 200, 100};
+  	float t = 0;
+	int highscore[] = {500, 400, 300, 200, 100};
   	char* names[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
   	char alias[7] = "Noname";
-  	int abcVolba = 0 ;
   	char* menuVolba[] = {"PLAY GAME", "CHANGE MY NAME", "HIGH SCORE"};
   	char* abc[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Esc","Del","Ent"};
   	char abc2[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
   	char newAlias[7] =  "";
+
+  	//vytvorenie objektov
+  	for (int i = 0; i < 1000; i++){
+		blockX[i] = 81; 	// zaciatocna X-ova pozicia objektu
+		blockY[i] = 0; 	// zaciatocna Y-ova pozicia objektu
+		xDir[i] = 6; 	// velkost jedneho kroku na X-ovej osi
+		yDir[i] = 6; 	// velkost jedneho kroku na Y-ovej osi
+  	}
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
-  	int index = 0;
 
 	//cisloTvaru = generateNumber(AD_value);
   	cisloTvaru = generateNumber(AD_value);
-	int volba =0;
   /* Infinite loop */
   while (1)
   {
@@ -696,88 +678,99 @@ int main(void)
 		  volba = returnVolba(AD_value, volba);		// vrati hodnotu vybranej volby
 		  run = returnRun(AD_value, volba, run);	// vrati volbu dalsieho okna
 	  }
-	  else if (run == 1){ // play
-		  createText(alias);   	// vypis textov
-	  		  cas++;
-			  if (cas == 2){
-				  t++;
-				  sprintf(time, "%d", t);
-				  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-				  cas = 0;
-			  }
-			  // v kazdom kroku aktualizuje maticu
-			  matrixPlot(matrix, cisloTvaru);
-			  // vymaze dany objekt
-			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
+	  // Play game
+	  else if (run == 1){
+		  // vypise texty na lavu stranu
+		  createText(alias);
+		  // v kazdom kroku aktualizuje maticu
+		  matrixPlot(matrix, cisloTvaru);
+		  // vymaze dany objekt
+		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
+		  // v kazdom kroku posuva objekt smerom dole
+		  blockY[count] += yDir[count];
 
-			  // v kazdom kroku posuva objekt smerom dole
-			  blockY[count] += yDir[count];
+		  //buttonPressed(AD_value, );
+		  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
+		  if ((AD_value>1700) && (AD_value<2300)){
+			  xDir[count] = 6;
+			  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
+			  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
+				  xDir[count] = 0;
+			  }
+			  else
+				  blockX[count] -= xDir[count]; // dolava
+		  }
+		  else if ((AD_value>2500) && (AD_value<3100)){
+			  xDir[count] = 6;
+			  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
+			  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
+				  xDir[count] = 0;
+			  }
+			  else
+				  blockX[count] += xDir[count]; // doprava
+		  }
+		  // ak stlacime stvrte tlacidlo, otoci sa objekt
+		  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
+			  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
+				  cisloTvaru = rotateObject(cisloTvaru);
+				  cc=1;
+			  }
+		  }
+		  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
+		  else if ((AD_value>3300) && (AD_value<3450)){
+			  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
+				  blockY[count] += 0;
+			  else
+				  blockY[count] += 6;
+		  }
 
-			  // ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
-			  if ((AD_value>1700) && (AD_value<2300)){
-				  xDir[count] = 6;
-				  // v kazdom kroku checkuje ci sa nenachadza nieco na lavej strane objektu
-				  if (checkLeftSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // lava strana
-					  xDir[count] = 0;
-				  }
-				  else
-					  blockX[count] -= xDir[count]; // dolava
-			  }
-			  else if ((AD_value>2500) && (AD_value<3100)){
-				  xDir[count] = 6;
-				  // v kazdom kroku checkuje ci sa nenachadza nieco na pravej strane objektu
-				  if (checkRightSide(matrix, blockX[count],blockY[count], cisloTvaru)){ // prava strana
-					  xDir[count] = 0;
-				  }
-				  else
-					  blockX[count] += xDir[count]; // doprava
-			  }
-			  // ak stlacime stvrte tlacidlo, otoci sa objekt
-			  else if ((AD_value>3520) && (AD_value<3650) && cc==0){
-				  if (!checkRotation(matrix, blockX[count], blockY[count], cisloTvaru)){
-					  cisloTvaru = rotateObject(cisloTvaru);
-					  cc=1;
-				  }
-			  }
-			  // ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
-			  else if ((AD_value>3300) && (AD_value<3450)){
-				  if (checkBlockade(matrix, blockX[count],blockY[count]+12, cisloTvaru))
-					  blockY[count] += 0;
-				  else
-					  blockY[count] += 6;
-			  }
+		  // checkuje naplnene riadky
+		  tempScore = score;
+		  score += checkLineFilled(matrix);
+		  lines += returnLines(tempScore, score);
+		  // Vypise score
+		  sprintf(scoree, "%d", score);
+		  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
-			  // checkuje naplnene riadky
-			  tempScore = score;
-			  score += checkLineFilled(matrix);
-			  lines += returnLines(tempScore, score);
-			  // Vypise score
-			  sprintf(scoree, "%d", score);
-			  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  sprintf(line, "%d", lines);
+		  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
-			  sprintf(line, "%d", lines);
-			  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		  t=t+0.8;
+		  tt=t;
+		  sprintf(time, "%d", tt);
+		  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
-			  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
-			  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
-			  {
-				  // zastavi sa objekt
-				  yDir[count] = 0;
-				  // necha objekt na konecnom mieste
-				  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
-				  // GAME OVER
-				  if(checkGameOver(matrix, blockY[count], cisloTvaru)){
-					  matrixPlot(matrix, cisloTvaru);
-					  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-					  run = 4;
-				  }
-				  // vygenerujeme dalsi objekt
-				  count++;
-				  cisloTvaru = generateNumber(AD_value);
+		  tempApm = apm;
+		  apm = score/tt;
+		  sprintf(pm, "%d", apm);
+		  if (tempApm != apm){
+			  sprintf(tempPm, "%d", tempApm);
+			  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+		  }
+		  lcdPutS(pm, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+		  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
+		  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
+		  {
+			  // zastavi sa objekt
+			  yDir[count] = 0;
+			  // necha objekt na konecnom mieste
+			  placeDownBlock(matrix, blockX[count], blockY[count], cisloTvaru);
+			  // GAME OVER
+			  if(checkGameOver(matrix,blockX[count],blockY[count], cisloTvaru)){
+				  matrixPlot(matrix, cisloTvaru);
+				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+				  run = 4;
 			  }
-			  // vykresli dany objekt
-			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
-			  cc = 0;
+			  // vygenerujeme dalsi objekt
+			  count++;
+			  if (count > 999)
+				  run = 4;
+			  cisloTvaru = generateNumber(AD_value);
+		  }
+		  // vykresli dany objekt
+		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
+		  cc = 0;
 	  }
 	  // Change my name
 	  else if (run == 2){
@@ -790,49 +783,10 @@ int main(void)
 		  showHighscore(highscore, names);
 		  run = goBack(AD_value, run);
 	  }
-	  else if (run == 4){ // game over
-		  lcdPutS("Game  Over", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-		  lcdPutS("Your score is:", lcdTextX(1), lcdTextY(3), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-		  lcdPutS(scoree, lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-		  lcdPutS("Press any key to return to the menu!", lcdTextX(1), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-		  if (score >= highscore[0]){
-			  highscore[0]=score;
-			  names[0] = alias;
-		  }
-		  else if (score < highscore[0]  && score >= highscore[1]){
-			  highscore[1] = score;
-			  names[1] = alias;
-		  }
-		  else if (score < highscore[1]  && score >= highscore[2]){
-			  highscore[2] = score;
-			  names[2] = alias;
-		  }
-		  else if (score < highscore[2]  && score >= highscore[3]){
-			  highscore[3] = score;
-			  names[3] = alias;
-		  }
-		  else if (score < highscore[3]  && score >= highscore[4]){
-			  highscore[4] = score;
-			  names[4] = alias;
-		  }
-
-
-		  if ((AD_value>1700) && (AD_value<3650)){
-			  lcdClearDisplay(decodeRgbValue(0, 0, 0));
-			  score = 0;
-			  t=0;
-			  lines = 0;
-			  cas = 0;
-			  run = 0;
-				for (count = 0; count < 1000; count++){
-					blockX[count] = 81; 	// zaciatocna X-ova pozicia objektu
-					blockY[count] = 0; 	// zaciatocna Y-ova pozicia objektu
-					xDir[count] = 6; 	// velkost jedneho kroku na X-ovej osi
-					yDir[count] = 6; 	// velkost jedneho kroku na Y-ovej osi
-				}
-			  count = 0;
-			  createFrame(matrix);
-		  }
+	  // Game over
+	  else if (run == 4){
+		  drawGameOver(scoree, score, highscore, names, alias, time, pm);
+		  clearData(AD_value, &score, &t, &lines, &apm, &run, blockX, blockY, xDir, yDir, &count, matrix);
 	  }
   }
 

@@ -160,7 +160,7 @@ int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int generateNumber(volatile int AD_value);
-int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru);
+int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int returnLines(int tempScore, int score);
 
 // funkcie hlavneho okna
@@ -176,5 +176,9 @@ int goBack(volatile int AD_value, int run);
 void drawABC(int abcVolba, char* abc[]);
 int returnAbcVolba(volatile int AD_value, int abcVolba);
 void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], char abc2[], int *run, char alias[7]);
+
+// funkcie okna game over
+void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]);
+void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]);
 
 #endif /* ILI9163LCD_H_ */
