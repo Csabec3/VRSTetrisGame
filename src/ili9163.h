@@ -162,7 +162,8 @@ int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 int generateNumber(volatile int AD_value);
 int checkGameOver(uint16_t matrix[128][128], int16_t y0, int cisloTvaru);
 int returnLines(int tempScore, int score);
-void menu(volatile int AD_value, int volba);
+void menu(volatile int AD_value, int volba, char* menuVolba[]);
 void showHighscore(int highscore[], char* names[]);
+void setName(int abcVolba, char* abc[]);
 
 #endif /* ILI9163LCD_H_ */

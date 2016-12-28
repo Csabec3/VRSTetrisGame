@@ -672,19 +672,26 @@ int main(void)
   	int cisloTvaru;
   	int tempScore=0;
   	int run = 0;
-  	int highscore[] = {5000, 4000, 3000, 2000, 1000};
+  	int highscore[] = {500, 400, 300, 200, 100};
   	char* names[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
-  	char alias[7] = "Player1";
+  	char alias[7] = "Noname";
+  	int abcVolba = 0 ;
+  	char* menuVolba[] = {"PLAY GAME", "CHANGE MY NAME", "HIGH SCORE"};
+  	char* abc[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Esc","Del","Ent"};
+  	char abc2[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+  	char newAlias[7] =  "";
   	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
   	createFrame(matrix);
+  	int index = 0;
 
-	cisloTvaru = generateNumber(AD_value);
+	//cisloTvaru = generateNumber(AD_value);
+  	cisloTvaru = generateNumber(AD_value);
 	int volba =0;
   /* Infinite loop */
   while (1)
   {
 	  if (run == 0){ // menu
-		  menu(AD_value, volba);
+		  menu(AD_value, volba, menuVolba);
 		  if ((AD_value>1700) && (AD_value<2300)){
 			  volba+=1;
 			  if (volba > 2)
@@ -714,7 +721,7 @@ int main(void)
 			  if (cas == 2){
 				  t++;
 				  sprintf(time, "%d", t);
-				  lcdPutS(time, lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+				  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 				  cas = 0;
 			  }
 			  // v kazdom kroku aktualizuje maticu
@@ -765,10 +772,10 @@ int main(void)
 			  lines += returnLines(tempScore, score);
 			  // Vypise score
 			  sprintf(scoree, "%d", score);
-			  lcdPutS(scoree, lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 			  sprintf(line, "%d", lines);
-			  lcdPutS(line, lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 			  // v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
 			  if (checkBlockade(matrix, blockX[count],blockY[count], cisloTvaru))
@@ -790,6 +797,51 @@ int main(void)
 			  // vykresli dany objekt
 			  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
 			  cc = 0;
+	  }
+	  else if (run == 2){ // alias
+		  setName(abcVolba, abc);
+		  if ((AD_value>1700) && (AD_value<2300)){
+			  abcVolba+=1;
+			  if (abcVolba > 28)
+				  abcVolba = 0;
+		  }
+		  else if ((AD_value>2500) && (AD_value<3100)){
+			  abcVolba-=1;
+			  if (abcVolba < 0)
+				  abcVolba = 28;
+		  }
+		  else if ((AD_value>3300) && (AD_value<3650)){
+			  if (abcVolba < 26 && index < 7){
+				  newAlias[index]=abc2[abcVolba];
+				  lcdPutCh(newAlias[index], lcdTextX(index+1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+				  index++;
+			  }
+			  else if (abcVolba < 26 && index > 6){
+				  lcdPutS("No more space!", lcdTextX(2), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			  }
+			  else if (abcVolba == 26){
+				  index = 0;
+				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+				  run = 0;
+			  }
+			  else if (abcVolba == 27){
+				  index--;
+				  newAlias[index]=' ';
+				  lcdPutCh(newAlias[index], lcdTextX(index+1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+				  lcdPutS("No more space!", lcdTextX(2), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+			  }
+			  else if (abcVolba == 28){
+				  for (int v=0; v<7; v++)
+					  if (newAlias[v] == ' ')
+						  alias[v] = ' ';
+					  else
+						  alias[v] = newAlias[v];
+				  lcdClearDisplay(decodeRgbValue(0, 0, 0));
+				  index = 0;
+				  run = 0;
+			  }
+
+		  }
 	  }
 	  else if (run == 3){ // high score
 		  showHighscore(highscore, names);

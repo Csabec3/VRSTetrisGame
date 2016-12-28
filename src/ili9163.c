@@ -993,10 +993,12 @@ void createFrame(uint16_t matrix[128][128]){
 }
 
 void createText(char alias[7]){
-	lcdPutS(alias, lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-	lcdPutS("Lines", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Score", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Time", lcdTextX(1), lcdTextY(9), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Player:", lcdTextX(1), lcdTextY(1), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	for (int i=0; i<7; i++)
+		lcdPutCh(alias[i], lcdTextX(i+1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){
@@ -1586,25 +1588,18 @@ int returnLines(int tempScore, int score){
 	return lines;
 }
 
-void menu(volatile int AD_value, int volba){
-	lcdPutS("Tetris the GAME", lcdTextX(1), lcdTextY(1), decodeRgbValue(0, 0, 0), decodeRgbValue(31, 31, 31));
-	switch(volba){
-		case 0:
-			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
-			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			break;
-		case 1:
-			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
-			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			break;
-		case 2:
-			lcdPutS("PLAY", lcdTextX(1), lcdTextY(3), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			lcdPutS("ALIAS", lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-			lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(7), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
-			break;
+void menu(volatile int AD_value, int volba, char* menuVolba[]){
+	lcdPutS("TETRIS", lcdTextX(8), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	lcdPutS("THE RETRO GAME", lcdTextX(2), lcdTextY(4), decodeRgbValue(15, 31, 0), decodeRgbValue(0, 0, 0));
+	int j=1;
+	for (int i=0; i<3; i++){
+		if(i==volba)
+			lcdPutS(menuVolba[i], lcdTextX(1), lcdTextY(i+7+j), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+		else
+			lcdPutS(menuVolba[i], lcdTextX(1), lcdTextY(i+7+j), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		j++;
 	}
+
 
 }
 
@@ -1615,30 +1610,60 @@ void showHighscore(int highscore[], char* names[]){
 	char hScore4[6];
 	char hScore5[6];
 
+	for (int i=0; i<7;i++){
+		lcdPutCh(names[0][i], lcdTextX(i+4), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[1][i], lcdTextX(i+4), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[2][i], lcdTextX(i+4), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[3][i], lcdTextX(i+4), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[4][i], lcdTextX(i+4), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	}
 	lcdPutS("HIGHSCORE", lcdTextX(1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("1.", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS(names[0], lcdTextX(4), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	lcdPutS(":", lcdTextX(12), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	sprintf(hScore1, "%d", highscore[0]);
 	lcdPutS(hScore1, lcdTextX(14), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("2.", lcdTextX(1), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS(names[1], lcdTextX(4), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	lcdPutS(":", lcdTextX(12), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	sprintf(hScore2, "%d", highscore[1]);
 	lcdPutS(hScore2, lcdTextX(14), lcdTextY(6), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("3.", lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS(names[2], lcdTextX(4), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	lcdPutS(":", lcdTextX(12), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	sprintf(hScore3, "%d", highscore[2]);
 	lcdPutS(hScore3, lcdTextX(14), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("4.", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS(names[3], lcdTextX(4), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	lcdPutS(":", lcdTextX(12), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	sprintf(hScore4, "%d", highscore[3]);
 	lcdPutS(hScore4, lcdTextX(14), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("5.", lcdTextX(1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS(names[4], lcdTextX(4), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
 	lcdPutS(":", lcdTextX(12), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	sprintf(hScore5, "%d", highscore[4]);
 	lcdPutS(hScore5, lcdTextX(14), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+}
+
+void setName(int abcVolba, char* abc[]){
+	int k = 2;
+	int y = 4;
+	lcdPutS("Choose characters", lcdTextX(2), lcdTextY(1), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	for(int i=0; i<29; i++){
+		if (k<17 && y<10){
+			k=k+2;
+		}
+		else if (k>16 && y<10){
+			y=y+2;
+			k=2;
+		}
+		else if (k<17 && y>9){
+			k=k+7;
+		}
+		if (i==abcVolba)
+			lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(0, 0, 0), decodeRgbValue(255, 255, 255));
+		else
+			lcdPutS(abc[i], lcdTextX(k), lcdTextY(y), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	}
+
 }
