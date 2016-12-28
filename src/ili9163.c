@@ -993,13 +993,13 @@ void createFrame(uint16_t matrix[128][128]){
 }
 
 void createText(char alias[7]){
-	lcdPutS("Player:", lcdTextX(1), lcdTextY(1), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Player:", lcdTextX(1), lcdTextY(1), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	for (int i=0; i<7; i++)
 		lcdPutCh(alias[i], lcdTextX(i+1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	lcdPutS("Apm:", lcdTextX(1), lcdTextY(13), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("Apm:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){
@@ -1736,10 +1736,10 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 			lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			*run = 0;
 		}
-		else if (abcVolba == 27){
+		else if (abcVolba == 27 && *index > 0){
 			*index = *index - 1;
 			newAlias[*index] = ' ';
-			lcdPutCh(newAlias[*index], lcdTextX(*index + 1), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+			lcdPutCh(newAlias[*index], lcdTextX(*index + 7), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 			lcdPutS("MAX 7 CHARS!!!", lcdTextX(4), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
 		}
 		else if (abcVolba == 28){
@@ -1866,3 +1866,6 @@ void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_
 	  *cisloTvaru = generateNumber(AD_value);
 	}
 }
+
+//
+
