@@ -1,31 +1,4 @@
-/**
- * @file ili9163lcd.c
- * @brief ILI9163 128x128 LCD Driver
- *
- * This code has been ported from the ili9163lcd library for avr made
- * by Simon Inns, to run on a msp430.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/
- *
- * @author Simon Inns <simon.inns@gmail.com>
- * @author Christopher Vagnetoft (NoccyLabs)
- * @copyright (C) 2012 Simon Inns
- * @copyright parts (C) 2012 NoccyLabs
- */
-
 #include <string.h>
-
 #include "ili9163.h"
 #include "font5x8.h"
 #include "spi.h"
@@ -35,6 +8,42 @@
 
 uint16_t matrix_pom[128][128];
 // Low-level LCD driving functions --------------------------------------------------------------------------
+
+// Funkcia potrebne pre spustenie prerusenia
+void startupNVIC(){
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+// Funkcia potrebne pre ADC
+void adc_init(void){
+  GPIO_InitTypeDef GPIO_InitStructure;
+  ADC_InitTypeDef ADC_InitStructure;
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 ;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  RCC_HSICmd(ENABLE);
+  while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  ADC_StructInit(&ADC_InitStructure);
+  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  ADC_InitStructure.ADC_NbrOfConversion = 1;
+  ADC_Init(ADC1, &ADC_InitStructure);
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_96Cycles);
+  ADC_Cmd(ADC1, ENABLE);
+  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET){}
+  ADC_SoftwareStartConv(ADC1);
+}
 
 // Reset the LCD hardware
 void lcdReset(void)
@@ -167,7 +176,6 @@ void lcdInitialise(uint8_t orientation)
 }
 
 // LCD graphics functions -----------------------------------------------------------------------------------
-
 void lcdClearDisplay(uint16_t colour)
 {
 	uint16_t pixel;
@@ -268,19 +276,17 @@ void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16
 	}
 }
 
+// Funkcia konvertuje celu maticu na 1D pole a zapise ho do pamati a rozdeluje tvary podla farby
 void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
-
-	uint16_t pixels[62*128];
+	uint16_t pixels[62 * 128];
 	uint16_t colour;
-
-	int countPix=0;
-	for(int i=0;i<128;i++){
-		for(int j=56;j<118;j++){
-			pixels[countPix]=matrix[j][i];
+	int countPix = 0;
+	for(int i = 0;i < 128; i++){
+		for(int j = 56;j < 118; j++){
+			pixels[countPix] = matrix[j][i];
 			countPix++;
 		}
 	}
-
 	lcdWriteCommand(SET_COLUMN_ADDRESS); // Horizontal Address Start Position
 	lcdWriteParameter(0x20);
 	lcdWriteParameter(56);
@@ -295,11 +301,11 @@ void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
 
 	lcdWriteCommand(WRITE_MEMORY_START);
 
-	for (int x = 0; x < (62*128); x++){
-		if (pixels[x]==0){
+	for (int x = 0; x < (62 * 128); x++){
+		if (pixels[x] == 0){
 			colour = decodeRgbValue(0, 0, 0);
 		}
-		else if (pixels[x]==1){
+		else if (pixels[x] == 1){
 			if (cisloTvaru == 0)
 				colour = decodeRgbValue(31, 31, 0);
 			if (cisloTvaru == 1 || cisloTvaru == 2)
@@ -315,1218 +321,1228 @@ void matrixPlot(uint16_t matrix[128][128], int cisloTvaru){
 			if (cisloTvaru == 15 || cisloTvaru == 16 || cisloTvaru == 17 || cisloTvaru == 18)
 				colour = decodeRgbValue(31, 15, 31);
 		}
-		else if (pixels[x]==2){
+		else if (pixels[x] == 2){
 			colour = decodeRgbValue(31, 31, 31);
 		}
-		else if (pixels[x]==3){
+		else if (pixels[x] == 3){
 			colour = decodeRgbValue(31, 31, 0);
 		}
-		else if (pixels[x]==4){
+		else if (pixels[x] == 4){
 			colour = decodeRgbValue(0, 31, 31);
 		}
-		else if (pixels[x]==5){
+		else if (pixels[x] == 5){
 			colour = decodeRgbValue(31, 0, 0);
 		}
-		else if (pixels[x]==6){
+		else if (pixels[x] == 6){
 			colour = decodeRgbValue(0, 31, 0);
 		}
-		else if (pixels[x]==7){
+		else if (pixels[x] == 7){
 			colour = decodeRgbValue(0, 0, 31);
 		}
-		else if (pixels[x]==8){
+		else if (pixels[x] == 8){
 			colour = decodeRgbValue(15, 0, 31);
 		}
-		else if (pixels[x]==9){
+		else if (pixels[x] == 9){
 			colour = decodeRgbValue(31, 15, 31);
 		}
-		lcdWriteData(colour >> 8, colour);;
+		lcdWriteData(colour >> 8, colour);
 	}
-
 }
 
+// Funkcia vykresli tvar objeku podla toho, aku farbu zvolime, resp ciernu alebo bielu
 void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba){
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<12;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 12; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = volba;
 	}
 	// ak objekt je obdlznik |
 	else if (cisloTvaru == 1){
-		for(int i=0;i<6;i++)
-			for(int j=0;j<24;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 6; i++)
+			for(int j = 0; j < 24; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = volba;
 	}
 	// ak objekt je obdlznik _
 	else if (cisloTvaru == 2){
-		for(int i=0;i<24;i++)
-			for(int j=0;j<6;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 24; i++)
+			for(int j = 0; j < 6; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = volba;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i>5)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i<12)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && i < 12)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && j<12)
-						matrix[x0+i][y0-j]=volba;
-					if (j<12 && i<6)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && j < 12)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j < 12 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je opaèný Z
 	else if (cisloTvaru == 5){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=volba;
-					if (j<6 && i<12)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j < 6 && i < 12)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && j<12)
-						matrix[x0+i][y0-j]=volba;
-					if (j<12 && i>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && j < 12)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j < 12 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j<6)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>11)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && i > 11)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<12 && i>5)
-						matrix[x0+i][y0-j]=volba;
-					if (j>11)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 12 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 11)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je _._
 	else if (cisloTvaru == 11){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && (i>5 && i<12))
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && (i > 5 && i < 12))
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if ((j>5 && j<12) && (i<6))
-						matrix[x0+i][y0-j]=volba;
-					if (i>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if ((j > 5 && j < 12) && (i < 6))
+						matrix[x0 + i][y0 - j] = volba;
+					if (i > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je ..,..
 	else if (cisloTvaru == 13){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && (i>5 && i<12))
-						matrix[x0+i][y0-j]=volba;
-					if (j>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && (i > 5 && i < 12))
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (i<6)
-						matrix[x0+i][y0-j]=volba;
-					if ((j>5 && j<12) && (i>5))
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (i < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if ((j > 5 && j < 12) && (i > 5))
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0;i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i>11)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0;i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i > 11)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<12 && i<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>11)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 12 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 11)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 18){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=volba;
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=volba;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = volba;
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = volba;
 				}
 			}
 	}
 }
 
+// Funkcia checkuje ci sa nenachadza objekt alebo ramec pred aktalnym objektom
 int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
-
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i || matrix[x0+18][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 + 1] == i || matrix[x0 + 18][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 5] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 - 5] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0-5]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 - 5] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 5] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-11]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 11] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i || matrix[x0+12][y0-5]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 - 5] == i || matrix[x0 + 12][y0 - 5] == i)
 				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 5] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-5]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0-5]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 5] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 - 5] == i)
 				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-5]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 - 5] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0-5]==i || matrix[x0+6][y0-5]==i || matrix[x0+12][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 - 5] == i || matrix[x0 + 6][y0 - 5] == i || matrix[x0 + 12][y0 + 1] == i)
 				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0-11]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 - 11] == i)
 				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0][y0+1]==i || matrix[x0+6][y0+1]==i || matrix[x0+12][y0+1]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0][y0 + 1] == i || matrix[x0 + 6][y0 + 1] == i || matrix[x0 + 12][y0 + 1] == i)
 				temp = 1;
 	}
 	return temp;
 }
 
+// Funkcia checkuje ci sa nenachadza objekt alemo ramec na lavej strane aktualneho objektu
 int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i || matrix[x0-1][y0-18]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i || matrix[x0 - 1][y0 - 18] == i)
 				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i)
 				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		if (matrix[x0+5][y0]==2 || matrix[x0+5][y0]==3 || matrix[x0-1][y0-6]==2 || matrix[x0-1][y0-6]==3)
-			temp = 1;
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 5][y0] == i || matrix[x0 - 1][y0 - 6] == i)
+				temp = 1;
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0+5][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 + 5][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 + 5][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 5][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0+11][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 + 11][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+5][y0]==i || matrix[x0+5][y0-6]==i || matrix[x0-1][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 5][y0] == i || matrix[x0 + 5][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 + 5][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0+5][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 5][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 + 5][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+5][y0]==i || matrix[x0-1][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 5][y0] == i || matrix[x0 - 1][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0+5][y0-6]==i || matrix[x0+5][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 + 5][y0 - 6] == i || matrix[x0 + 5][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+11][y0]==i || matrix[x0-1][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 11][y0] == i || matrix[x0 - 1][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i || matrix[x0-1][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i || matrix[x0 - 1][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0-1][y0]==i || matrix[x0-1][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 - 1][y0] == i || matrix[x0 - 1][y0 - 6] == i)
 				temp = 1;
 	}
 	return temp;
 }
 
+// Funkcia checkuje ci sa nenachadza objekt alemo ramec na pravej strane aktualneho objektu
 int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 12][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |
 	else if (cisloTvaru == 1){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+6][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+6][y0-12]==i || matrix[x0+6][y0-18]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 6][y0] == i || matrix[x0 + 6][y0 - 6] == i || matrix[x0 + 6][y0 - 12] == i || matrix[x0 + 6][y0 - 18] == i)
 				temp = 1;
 	}
 	// ak objekt je stvorec _
 	else if (cisloTvaru == 2){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i)
 				temp = 1;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+18][y0]==i || matrix[x0+12][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 18][y0] == i || matrix[x0 + 12][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+6][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 6][y0] == i || matrix[x0 + 12][y0 - 6] == i || matrix[x0 + 12][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny Z
 	else if (cisloTvaru == 5){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+18][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 18][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+6][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 12][y0-6] == i || matrix[x0 + 6][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+6][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 6][y0 - 6] == i || matrix[x0 + 6][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+18][y0]==i || matrix[x0+18][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 18][y0] == i || matrix[x0 + 18][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 12][y0 - 6] == i || matrix[x0 + 12][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+6][y0]==i || matrix[x0+18][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 6][y0] == i || matrix[x0 + 18][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je .|.
 	else if (cisloTvaru == 11){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+18][y0]==i || matrix[x0+12][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 18][y0] == i || matrix[x0 + 12][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 12][y0 - 6] == i || matrix[x0 + 12][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je .,.
 	else if (cisloTvaru == 13){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+18][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 18][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+6][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+6][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 6][y0] == i || matrix[x0 + 12][y0 - 6] == i || matrix[x0 + 6][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+12][y0]==i || matrix[x0+12][y0-6]==i || matrix[x0+12][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 12][y0] == i || matrix[x0 + 12][y0 - 6] == i || matrix[x0 + 12][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+18][y0]==i || matrix[x0+18][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 18][y0] == i || matrix[x0 + 18][y0 - 6] == i)
 				temp = 1;
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+6][y0]==i || matrix[x0+6][y0-6]==i || matrix[x0+12][y0-12]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 6][y0] == i || matrix[x0 + 6][y0 - 6] == i || matrix[x0 + 12][y0 - 12] == i)
 				temp = 1;
 	}
 	// ak objekt je ._
 	else if (cisloTvaru == 18){
-		for (int i = 2; i<10; i++)
-			if (matrix[x0+18][y0]==i || matrix[x0+6][y0-6]==i)
+		for (int i = 2; i < 10; i++)
+			if (matrix[x0 + 18][y0] == i || matrix[x0 + 6][y0 - 6] == i)
 				temp = 1;
 	}
 	return temp;
 }
 
+// Funkcia checkuje ci sa nachadzaju naplnene riadky v matici a vymaze ich, a vrati bodovanie podla toho kolko riadkov boli vymazane
 int checkLineFilled(uint16_t matrix[128][128]){
 	int cRow[127];
 	int temp = 0;
-	int count=0;
-	for (int x =0; x<127;x++){
-		cRow[x]=0;
+	int count = 0;
+	int pom = 0;
+	for (int x = 0; x < 127; x++){
+		cRow[x] = 0;
 	}
-	for(int i=0;i<127;i++){
-		for(int j=57;j<117;j++){
-			for (int z = 2; z<10; z++)
-				if (matrix[j][i]==z)
+	for(int i = 0; i < 127; i++){
+		for(int j = 57;j < 117; j++){
+			for (int z = 2; z < 10; z++)
+				if (matrix[j][i] == z)
 					cRow[i] += 1;
 				}
-		if (cRow[i]==60){
+		if (cRow[i] == 60){
 			count++;
-			for(int j=57;j<117;j++){
-				matrix[j][i]=0;
+			for(int j = 57; j < 117; j++){
+				matrix[j][i] = 0;
 			}
 		}
 	}
-	for(int i=0;i<127;i++){
-		for(int j=57;j<117;j++){
-			if (cRow[i]==60){
-				int pom = i;
-				while(pom!=0){
-					matrix[j][pom] = matrix[j][pom-1];
+	for(int i = 0; i < 127; i++){
+		for(int j = 57; j < 117; j++){
+			if (cRow[i] == 60){
+				pom = i;
+				while(pom != 0){
+					matrix[j][pom] = matrix[j][pom - 1];
 					pom--;
 				}
 			}
 		}
 	}
-	if (count/6 == 1){
+	if ((count / 6) == 1){
 		temp = 100;
 	}
-	else if (count/6 == 2){
+	else if ((count / 6) == 2){
 		temp = 200;
 	}
-	else if (count/6 == 3){
+	else if ((count / 6) == 3){
 		temp = 300;
 	}
-	else if (count/6 == 4){
+	else if ((count / 6) == 4){
 		temp = 800;
 	}
 	return temp;
 }
 
+// Funkcia checkuje ci sa objekt ktora nachadza uplne hore nema nieco pred sebou, ak ano tak hra sa skonci
 int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
-	for (int i=0; i<19; i++)
-		if (i!=2)
-			for (int j=2; j<10; j++)
-			if ((cisloTvaru == i) && (y0-6)==0 && (matrix[x0][y0+1]==j))
-				temp=1;
+	for (int i = 0; i < 19; i++)
+		if (i != 2)
+			for (int j = 2; j < 10; j++)
+			if ((cisloTvaru == i) && (y0 - 6)==0 && (matrix[x0][y0 + 1] == j))
+				temp = 1;
 	return temp;
 }
 
+// Funkcia vytvori ramec v ktorom sa uskutocnuje hra
 void createFrame(uint16_t matrix[128][128]){
-	for(int i=56;i<118;i++){
-		for(int j=0;j<128;j++){
-			if(i==56)
-				matrix[i][j]=2;
-			else if(i==117)
-				matrix[i][j]=2;
-			else if(j==127)
-				matrix[i][j]=2;
+	for(int i = 56; i < 118; i++){
+		for(int j = 0;j < 128; j++){
+			if(i == 56)
+				matrix[i][j] = 2;
+			else if(i == 117)
+				matrix[i][j] = 2;
+			else if(j == 127)
+				matrix[i][j] = 2;
 			else
-				matrix[i][j]=0;
+				matrix[i][j] = 0;
 		}
 	}
 }
 
+// Funkcia vypise texty a lavej strane hry
 void createText(char alias[7]){
 	lcdPutS("Player:", lcdTextX(1), lcdTextY(1), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	for (int i=0; i<7; i++)
-		lcdPutCh(alias[i], lcdTextX(i+1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	for (int i = 0; i < 7; i++)
+		lcdPutCh(alias[i], lcdTextX(i + 1), lcdTextY(2), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("P/M:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 }
 
+// Funkcia vykonava otocenie objektu
 int rotateObject(int cisloTvaru){
 	if (cisloTvaru == 1)
-		cisloTvaru+=1;
+		cisloTvaru += 1;
 	else if (cisloTvaru == 2)
-	  cisloTvaru-=1;
+	  cisloTvaru -= 1;
 	else if (cisloTvaru == 3)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 4)
-	  cisloTvaru-=1;
+	  cisloTvaru -= 1;
 	else if (cisloTvaru == 5)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 6)
-	  cisloTvaru-=1;
+	  cisloTvaru -= 1;
 	else if (cisloTvaru == 7)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 8)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 9)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 10)
-	  cisloTvaru-=3;
+	  cisloTvaru -= 3;
 	else if (cisloTvaru == 11)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 12)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 13)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 14)
-	  cisloTvaru-=3;
+	  cisloTvaru -= 3;
 	else if (cisloTvaru == 15)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 16)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 17)
-	  cisloTvaru+=1;
+	  cisloTvaru += 1;
 	else if (cisloTvaru == 18)
-	  cisloTvaru-=3;
+	  cisloTvaru -= 3;
 	return cisloTvaru;
 }
 
+// Funkcia checkuje ci je mozne vykonat rotaciu, ci sa nechadaza objekt na pravej strane
 int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
 	if (cisloTvaru == 1){
-		for(int i=0;i<24;i++)
-			for(int j=0;j<6;j++)
-				for (int z = 2; z<10; z++)
-					if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 24; i++)
+			for(int j = 0; j < 6; j++)
+				for (int z = 2; z < 10; z++)
+					if (matrix[x0 + i][y0 - j] == z)
 						temp = 1;
 	}
 	else if (cisloTvaru == 2){
-		for(int i=0;i<6;i++)
-			for(int j=0;j<24;j++)
-				for (int z = 2; z<10; z++)
-					if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 6; i++)
+			for(int j = 0; j < 24; j++)
+				for (int z = 2; z < 10; z++)
+					if (matrix[x0 + i][y0 - j] == z)
 						temp = 1;
 	}
 	else if (cisloTvaru == 3){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j>5 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j > 5 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && j<12)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && j < 12)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j<12 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+					if (j < 12 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 4){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && i<12)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && i < 12)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 5){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j>5 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j > 5 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && j<12)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && j < 12)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j<12 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (j < 12 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 6){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j>5 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j > 5 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j<6 && i<12)
-						if (matrix[x0+i][y0-j]==z)
+					if (j < 6 && i < 12)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 7){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && i>11)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && i > 11)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 8){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j<12 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 12 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>11)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 11)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 9){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 10){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j>5 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j > 5 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j<6)
-						if (matrix[x0+i][y0-j]==z)
+					if (j < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 11){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if ((j>5 && j<12) && (i<6))
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if ((j > 5 && j < 12) && (i < 6))
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (i>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 12){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6 && (i>5 && i<12))
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6 && (i > 5 && i < 12))
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 13){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (i<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if ((j>5 && j<12) && (i>5))
-						if (matrix[x0+i][y0-j]==z)
+					if ((j > 5 && j < 12) && (i > 5))
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 14){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && (i>5 && i<12))
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && (i > 5 && i < 12))
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 15){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6 && i>11)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6 && i > 11)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 16){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j<12 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0;i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 12 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>11)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 11)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 17){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && i<6)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && i < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
 	else if (cisloTvaru == 18){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				for (int z = 2; z<10; z++){
-					if (j<6)
-						if (matrix[x0+i][y0-j]==z)
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				for (int z = 2; z < 10; z++){
+					if (j < 6)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
-					if (j>5 && i>5)
-						if (matrix[x0+i][y0-j]==z)
+					if (j > 5 && i > 5)
+						if (matrix[x0 + i][y0 - j] == z)
 							temp = 1;
 				}
 			}
 	}
-
 	return temp;
 }
 
+// Funkcia necha blok na tom mieste kde zastavil pred prekazkou, kazdy tvar inou farbou
 void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	// ak objekt je stvorec
 	if (cisloTvaru == 0){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<12;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=3;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 12; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = 3;
 	}
 	// ak objekt je obdlznik |
 	else if (cisloTvaru == 1){
-		for(int i=0;i<6;i++)
-			for(int j=0;j<24;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=4;
+		for(int i = 0; i < 6; i++)
+			for(int j = 0; j < 24; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = 4;
 	}
 	// ak objekt je obdlznik _
 	else if (cisloTvaru == 2){
-		for(int i=0;i<24;i++)
-			for(int j=0;j<6;j++)
-				if (y0-j>1)
-					matrix[x0+i][y0-j]=4;
+		for(int i = 0; i < 24; i++)
+			for(int j = 0; j < 6; j++)
+				if (y0 - j > 1)
+					matrix[x0 + i][y0 - j] = 4;
 	}
 	// ak objekt je Z
 	else if (cisloTvaru == 3){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i>5)
-						matrix[x0+i][y0-j]=5;
-					if (j>5 && i<12)
-						matrix[x0+i][y0-j]=5;
-
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i > 5)
+						matrix[x0 + i][y0 - j] = 5;
+					if (j > 5 && i < 12)
+						matrix[x0 + i][y0 - j] = 5;
 				}
 			}
 	}
 	// ak objekt je N
 	else if (cisloTvaru == 4){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=5;
-					if (j>5 && j<12)
-						matrix[x0+i][y0-j]=5;
-					if (j<12 && i<6)
-						matrix[x0+i][y0-j]=5;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = 5;
+					if (j > 5 && j < 12)
+						matrix[x0 + i][y0 - j] = 5;
+					if (j < 12 && i < 6)
+						matrix[x0 + i][y0 - j] = 5;
 				}
 			}
 	}
 	// ak objekt je opaèný Z
 	else if (cisloTvaru == 5){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=6;
-					if (j<6 && i<12)
-						matrix[x0+i][y0-j]=6;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = 6;
+					if (j < 6 && i < 12)
+						matrix[x0 + i][y0 - j] = 6;
 				}
 			}
 	}
 	// ak objekt je opacny N
 	else if (cisloTvaru == 6){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=6;
-					if (j>5 && j<12)
-						matrix[x0+i][y0-j]=6;
-					if (j<12 && i>5)
-						matrix[x0+i][y0-j]=6;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = 6;
+					if (j > 5 && j < 12)
+						matrix[x0 + i][y0 - j] = 6;
+					if (j < 12 && i > 5)
+						matrix[x0 + i][y0 - j] = 6;
 				}
 			}
 	}
 	// ak objekt je L
 	else if (cisloTvaru == 7){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=7;
-					if (j<6)
-						matrix[x0+i][y0-j]=7;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = 7;
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = 7;
 				}
 			}
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 8){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=7;
-					if (j>5 && i>11)
-						matrix[x0+i][y0-j]=7;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = 7;
+					if (j > 5 && i > 11)
+						matrix[x0 + i][y0 - j] = 7;
 				}
 			}
 	}
 	// ak objekt je '|
 	else if (cisloTvaru == 9){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<12 && i>5)
-						matrix[x0+i][y0-j]=7;
-					if (j>11)
-						matrix[x0+i][y0-j]=7;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 12 && i > 5)
+						matrix[x0 + i][y0 - j] = 7;
+					if (j > 11)
+						matrix[x0 + i][y0 - j] = 7;
 				}
 			}
 	}
 	// ak objekt je ,..
 	else if (cisloTvaru == 10){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i<6)
-						matrix[x0+i][y0-j]=7;
-					if (j>5)
-						matrix[x0+i][y0-j]=7;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i < 6)
+						matrix[x0 + i][y0 - j] = 7;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = 7;
 				}
 			}
 	}
 	// ak objekt je _._
 	else if (cisloTvaru == 11){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=8;
-					if (j>5 && (i>5 && i<12))
-						matrix[x0+i][y0-j]=8;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = 8;
+					if (j > 5 && (i > 5 && i < 12))
+						matrix[x0 + i][y0 - j] = 8;
 				}
 			}
 	}
 	// ak objekt je -|
 	else if (cisloTvaru == 12){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if ((j>5 && j<12) && (i<6))
-						matrix[x0+i][y0-j]=8;
-					if (i>5)
-						matrix[x0+i][y0-j]=8;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if ((j > 5 && j < 12) && (i < 6))
+						matrix[x0 + i][y0 - j] = 8;
+					if (i > 5)
+						matrix[x0 + i][y0 - j] = 8;
 				}
 			}
 	}
 	// ak objekt je ..,..
 	else if (cisloTvaru == 13){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && (i>5 && i<12))
-						matrix[x0+i][y0-j]=8;
-					if (j>5)
-						matrix[x0+i][y0-j]=8;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && (i > 5 && i < 12))
+						matrix[x0 + i][y0 - j] = 8;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = 8;
 				}
 			}
 	}
 	// ak objekt je |-
 	else if (cisloTvaru == 14){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (i<6)
-						matrix[x0+i][y0-j]=8;
-					if ((j>5 && j<12) && (i>5))
-						matrix[x0+i][y0-j]=8;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (i < 6)
+						matrix[x0 + i][y0 - j] = 8;
+					if ((j > 5 && j < 12) && (i > 5))
+						matrix[x0 + i][y0 - j] = 8;
 				}
 			}
 	}
 	// ak objekt je opacny L
 	else if (cisloTvaru == 15){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=9;
-					if (j>5 && i>5)
-						matrix[x0+i][y0-j]=9;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = 9;
+					if (j > 5 && i > 5)
+						matrix[x0 + i][y0 - j] = 9;
 				}
 			}
 	}
 	// ak objekt je ..,
 	else if (cisloTvaru == 16){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6 && i>11)
-						matrix[x0+i][y0-j]=9;
-					if (j>5)
-						matrix[x0+i][y0-j]=9;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6 && i > 11)
+						matrix[x0 + i][y0 - j] = 9;
+					if (j > 5)
+						matrix[x0 + i][y0 - j] = 9;
 				}
 			}
 	}
 	// ak objekt je |'
 	else if (cisloTvaru == 17){
-		for(int i=0;i<12;i++)
-			for(int j=0;j<18;j++){
-				if (y0-j>1){
-					if (j<12 && i<6)
-						matrix[x0+i][y0-j]=9;
-					if (j>11)
-						matrix[x0+i][y0-j]=9;
+		for(int i = 0; i < 12; i++)
+			for(int j = 0; j < 18; j++){
+				if (y0 - j > 1){
+					if (j < 12 && i < 6)
+						matrix[x0 + i][y0 - j] = 9;
+					if (j > 11)
+						matrix[x0 + i][y0 - j] = 9;
 				}
 			}
 	}
 	// ak objekt je _.
 	else if (cisloTvaru == 18){
-		for(int i=0;i<18;i++)
-			for(int j=0;j<12;j++){
-				if (y0-j>1){
-					if (j<6)
-						matrix[x0+i][y0-j]=9;
-					if (j>5 && i<6)
-						matrix[x0+i][y0-j]=9;
+		for(int i = 0; i < 18; i++)
+			for(int j = 0; j < 12; j++){
+				if (y0 - j > 1){
+					if (j < 6)
+						matrix[x0 + i][y0 - j] = 9;
+					if (j > 5 && i < 6)
+						matrix[x0 + i][y0 - j] = 9;
 				}
 			}
 	}
 }
 
+// Funkcia vygeneruje nahdone cislo medzi 0 a 6, potom ak dane cislo ma viac tvarov, tak este vygeneruje nahodne cislo
 int generateNumber(volatile int AD_value){
-	int cislo = AD_value%7;
+	int cislo = AD_value % 7;
 	int cisloTvaru = 0;
 	int temp = 0;
 
 	if (cislo == 0)
 		cisloTvaru = 0;
 	else if (cislo == 1){
-		temp = AD_value%2;
+		temp = AD_value % 2;
 		if (temp == 0)
 			cisloTvaru = 1;
 		else if (temp == 1)
 			cisloTvaru = 2;
 	}
 	else if (cislo == 2){
-		temp = AD_value%2;
+		temp = AD_value % 2;
 		if (temp == 0)
 			cisloTvaru = 3;
 		else if (temp == 1)
 			cisloTvaru = 4;
 	}
 	else if (cislo == 3){
-		temp = AD_value%2;
+		temp = AD_value % 2;
 		if (temp == 0)
 			cisloTvaru = 5;
 		else if (temp == 1)
 			cisloTvaru = 6;
 	}
 	else if (cislo == 4){
-		temp = AD_value%4;
+		temp = AD_value % 4;
 		if (temp == 0)
 			cisloTvaru = 7;
 		else if (temp == 1)
@@ -1537,7 +1553,7 @@ int generateNumber(volatile int AD_value){
 			cisloTvaru = 10;
 	}
 	else if (cislo == 5){
-		temp = AD_value%4;
+		temp = AD_value % 4;
 		if (temp == 0)
 			cisloTvaru = 11;
 		else if (temp == 1)
@@ -1548,7 +1564,7 @@ int generateNumber(volatile int AD_value){
 			cisloTvaru = 14;
 	}
 	else if (cislo == 6){
-		temp = AD_value%4;
+		temp = AD_value % 4;
 		if (temp == 0)
 			cisloTvaru = 15;
 		else if (temp == 1)
@@ -1558,10 +1574,10 @@ int generateNumber(volatile int AD_value){
 		else if (temp == 3)
 			cisloTvaru = 18;
 	}
-
 	return cisloTvaru;
 }
 
+// Funkcia vrati pocet riadkov, ktore boli vymazane
 int returnLines(int tempScore, int score){
 	int lines = 0;
 	int temp = score - tempScore;
@@ -1624,7 +1640,7 @@ int returnVolba(volatile int AD_value, int volba){
 	return volba;
 }
 
-// Funkcia vrati hodnotu dalsieho vybranej okna
+// Funkcia vrati hodnotu dalsieho vybraneho okna
 int returnRun(volatile int AD_value, int volba, int run){
 	if (((AD_value > 3300) && (AD_value < 3650)) && volba == 0){
 		lcdClearDisplay(decodeRgbValue(0, 0, 0));
@@ -1647,11 +1663,11 @@ void showHighscore(int highscore[], char* names[]){
 	int j = 5;
 
 	for (int i = 0; i < 7; i++){
-		lcdPutCh(names[0][i], lcdTextX(i+6), lcdTextY(5), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[1][i], lcdTextX(i+6), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[2][i], lcdTextX(i+6), lcdTextY(9), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[3][i], lcdTextX(i+6), lcdTextY(11), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-		lcdPutCh(names[4][i], lcdTextX(i+6), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[0][i], lcdTextX(i + 6), lcdTextY(5), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[1][i], lcdTextX(i + 6), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[2][i], lcdTextX(i + 6), lcdTextY(9), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[3][i], lcdTextX(i + 6), lcdTextY(11), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+		lcdPutCh(names[4][i], lcdTextX(i + 6), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 		if (i < 5){
 			sprintf(hScore, "%d", highscore[i]);
 			lcdPutS(hScore, lcdTextX(15), lcdTextY(j), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
@@ -1724,10 +1740,10 @@ int returnAbcVolba(volatile int AD_value, int abcVolba){
 
 // Funkcia vymeni meno hraca alebo vrati naspat do menu
 void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], int *run, char alias[7]){
-	char abc2[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+	char abc[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 	if ((AD_value > 3300) && (AD_value < 3650)){
 		if (abcVolba < 26 && *index < 7){
-			newAlias[*index] = abc2[abcVolba];
+			newAlias[*index] = abc[abcVolba];
 			lcdPutCh(newAlias[*index], lcdTextX(*index + 7), lcdTextY(12), decodeRgbValue(31, 31, 0), decodeRgbValue(0, 0, 0));
 			*index = *index + 1;
 		}
@@ -1793,19 +1809,16 @@ void drawGameOver(char scoree[7], int score, int highscore[], char* names[], cha
 }
 
 // Funkcia resetuje parametre pre novu hru
-void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]){
+void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, int *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]){
 	if ((AD_value > 1700) && (AD_value < 3650)){
 		lcdClearDisplay(decodeRgbValue(0, 0, 0));
 		*score = 0;
-		*t = 0;
-		*lines = 0;
-		*apm = 0;
+		*time = 0;
+		*odstRiad = 0;
+		*ppm = 0;
 		*run = 0;
 		for (int i = 0; i < 1000; i++){
-			blockX[i] = 81;
-			blockY[i] = 0;
-			xDir[i] = 6;
-			yDir[i] = 6;
+			blockX[i] = 81; blockY[i] = 0; xDir[i] = 6; yDir[i] = 6;
 		}
 		*count = 0;
 		createFrame(matrix);
@@ -1813,7 +1826,7 @@ void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm
 }
 
 // Funkcia riadi jednotlive klavesy
-void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *cc){
+void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *rotCheck){
 	// ked gombiky su stlacene, tak posuva objekt dolava alebo doprava
 	if ((AD_value > 1700) && (AD_value < 2300)){
 		*xDir = 6;
@@ -1832,10 +1845,10 @@ void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][12
 			*blockX += *xDir; // doprava
 	}
 	// ak stlacime stvrte tlacidlo, otoci sa objekt
-	else if ((AD_value > 3520) && (AD_value < 3650) && *cc == 0){
+	else if ((AD_value > 3520) && (AD_value < 3650) && *rotCheck == 0){
 		if (!checkRotation(matrix, *blockX, *blockY, *cisloTvaru)){
 			*cisloTvaru = rotateObject(*cisloTvaru);
-			*cc=1;
+			*rotCheck=1;
 		}
 	}
 	// ak stlacime tretie tlacidlo, tak posunutie dole je zrychlene
@@ -1848,7 +1861,7 @@ void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][12
 }
 
 // Funkcia checkuje ci sa nenachadza objekt pred danym tvarom a checkuje ci sa nenastane koniec hry
-void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *count, volatile int AD_value){
+void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *cisObj, volatile int AD_value){
 	// v kazdom kroku checkuje, ci sa nenachadza dalsi objekt alebo ramec pred objektom
 	if (checkBlockade(matrix, *blockX, *blockY, *cisloTvaru))
 	{
@@ -1863,90 +1876,50 @@ void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_
 		  *run = 4;
 	  }
 	  // vygenerujeme dalsi objekt
-	  *count = *count + 1;
-	  if (*count > 999)
+	  *cisObj = *cisObj + 1;
+	  if (*cisObj > 999)
 		  *run = 4;
 	  *cisloTvaru = generateNumber(AD_value);
 	}
 }
 
-//
-void updateText( int *score, uint16_t matrix[128][128], int *lines, char scoree[7], char line[7], float *t, char time[7], int *apm, char pm[7]){
+// Funkcia aktualizuje hodnoty textov na lavej strane pocas hry
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], int *ppm, char ppmStr[7]){
 	int tempScore = 0;
-	int tt = 0;
+	int timeInt = 0;
 	int tempApm = 0;
 	char tempPm[7];
+
 	// checkuje naplnene riadky
-	  tempScore = *score;
-	  *score += checkLineFilled(matrix);
-	  *lines += returnLines(tempScore, *score);
-	  // Vypise score
-	  sprintf(scoree, "%d", *score);
-	  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	  // Vypise odstranene riadky
-	  sprintf(line, "%d", *lines);
-	  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	  // Vypise cas
-	  *t=*t+0.8;
-	  tt=*t;
-	  sprintf(time, "%d", tt);
-	  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-	  // Vypise score/min
-	  tempApm = *apm;
-	  *apm = *score/(tt/60);
-	  sprintf(pm, "%d", *apm);
-	  if (tempApm != *apm){
-		  sprintf(tempPm, "%d", tempApm);
-		  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
-	  }
-	  lcdPutS(pm, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	tempScore = *score;
+	*score += checkLineFilled(matrix);
+	*odstRiad += returnLines(tempScore, *score);
+
+	// Vypise score
+	sprintf(scoreStr, "%d", *score);
+	lcdPutS(scoreStr, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+	// Vypise odstranene riadky
+	sprintf(odstRiadStr, "%d", *odstRiad);
+	lcdPutS(odstRiadStr, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+	// Vypise cas
+	*time = *time + 0.8;
+	timeInt = *time;
+	sprintf(timeStr, "%d", timeInt);
+	lcdPutS(timeStr, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+
+	// Vypise score/min
+	tempApm = *ppm;
+	*ppm = *score/(timeInt/60);
+	sprintf(ppmStr, "%d", *ppm);
+	if (tempApm != *ppm){
+	  sprintf(tempPm, "%d", tempApm);
+	  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+	}
+	lcdPutS(ppmStr, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
-void adc_init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStructure;
-  ADC_InitTypeDef ADC_InitStructure;
-  /* Enable GPIO clock */
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-  /* Configure ADCx Channel 2 as analog input */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 ;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-  /* Enable the HSI oscillator */
-  RCC_HSICmd(ENABLE);
-  /* Check that HSI oscillator is ready */
-  while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
-  /* Enable ADC clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-  /* Initialize ADC structure */
-  ADC_StructInit(&ADC_InitStructure);
-  /* ADC1 configuration */
-  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
-  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
-  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-  ADC_InitStructure.ADC_NbrOfConversion = 1;
-  ADC_Init(ADC1, &ADC_InitStructure);
-  /* ADCx regular channel8 configuration */
-  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_96Cycles);
-  /* Enable the ADC */
-  ADC_Cmd(ADC1, ENABLE);
 
-  /* Wait until the ADC1 is ready */
-  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET)
-  {
-  }
-  /* Start ADC Software Conversion */
-  ADC_SoftwareStartConv(ADC1);
-}
 
-void startupNVIC(){
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn; // nam preruï¿½enï¿½ nï¿½jdete v sï¿½bore stm32l1xx.h
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-}
+

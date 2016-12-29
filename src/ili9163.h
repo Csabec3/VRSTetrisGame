@@ -134,6 +134,10 @@ uint8_t lcdTextX(uint8_t x);
 // it easy to place text
 uint8_t lcdTextY(uint8_t y);
 
+// Funkcie potrebne na prerusenia
+void startupNVIC();
+void adc_init(void);
+
 //	LCD function prototypes
 void lcdReset(void);
 void lcdWriteCommand(uint8_t address);
@@ -141,27 +145,13 @@ void lcdWriteParameter(uint8_t parameter);
 void lcdWriteData(uint8_t dataByte1, uint8_t dataByte2);
 void lcdInitialise(uint8_t orientation);
 
+// Funkcie potrebne na pracu s displayom
 void lcdClearDisplay(uint16_t colour);
 void matrixPlot(uint16_t matrix[128][128], int cisloTvaru);
 void lcdPutCh(unsigned char character, uint8_t x, uint8_t y, uint16_t fgColour, uint16_t bgColour);
 void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16_t bgColour);
-
-void startupNVIC();
-void adc_init(void);
-
 void createText(char alias[7]);
 void createFrame(uint16_t matrix[128][128]);
-void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
-void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int rotateObject(int cisloTvaru);
-int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int checkLineFilled(uint16_t matrix[128][128]);
-int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int generateNumber(volatile int AD_value);
-int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
-int returnLines(int tempScore, int score);
 
 // funkcie hlavneho okna
 void drawMenu(volatile int AD_value, int volba);
@@ -179,11 +169,22 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 
 // funkcie okna game over
 void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]);
-void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]);
+void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, int *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]);
 
 // funkcie pre Tetris
-void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *cc);
-void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *count, volatile int AD_value);
-void updateText(int *score, uint16_t matrix[128][128], int *lines, char scoree[7], char line[7], float *t, char time[7], int *apm, char pm[7]);
+void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *rotCheck);
+void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *cisObj, volatile int AD_value);
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], int *ppm, char ppmStr[7]);
+void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
+void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int rotateObject(int cisloTvaru);
+int checkBlockade(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int checkLineFilled(uint16_t matrix[128][128]);
+int checkLeftSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int checkRightSide(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int checkRotation(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int generateNumber(volatile int AD_value);
+int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
+int returnLines(int tempScore, int score);
 
 #endif /* ILI9163LCD_H_ */
