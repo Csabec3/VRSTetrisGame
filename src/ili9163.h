@@ -164,7 +164,7 @@ int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTv
 int returnLines(int tempScore, int score);
 
 // funkcie hlavneho okna
-void drawMenu(volatile int AD_value, int volba, char* menuVolba[]);
+void drawMenu(volatile int AD_value, int volba);
 int returnVolba(volatile int AD_value, int volba);
 int returnRun(volatile int AD_value, int volba, int run);
 
@@ -173,9 +173,9 @@ void showHighscore(int highscore[], char* names[]);
 int goBack(volatile int AD_value, int run);
 
 // funkcie okna change my name
-void drawABC(int abcVolba, char* abc[]);
+void drawABC(int abcVolba);
 int returnAbcVolba(volatile int AD_value, int abcVolba);
-void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], char abc2[], int *run, char alias[7]);
+void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], int *run, char alias[7]);
 
 // funkcie okna game over
 void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]);
@@ -184,5 +184,6 @@ void clearData(volatile int AD_value, int *score, float *t, int *lines, int *apm
 // funkcie pre Tetris
 void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *cc);
 void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *count, volatile int AD_value);
+void updateText(int *score, uint16_t matrix[128][128], int *lines, char scoree[7], char line[7], float *t, char time[7], int *apm, char pm[7]);
 
 #endif /* ILI9163LCD_H_ */

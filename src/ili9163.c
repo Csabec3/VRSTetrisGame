@@ -999,7 +999,7 @@ void createText(char alias[7]){
 	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS("Apm:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("P/M:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 }
 
 int rotateObject(int cisloTvaru){
@@ -1587,7 +1587,8 @@ int returnLines(int tempScore, int score){
 }
 
 // Funkcia vykresli startovaciu obrazovku a riadi pohyb medzi volbami
-void drawMenu(volatile int AD_value, int volba, char* menuVolba[]){
+void drawMenu(volatile int AD_value, int volba){
+	char* menuVolba[] = {"PLAY GAME", "CHANGE MY NAME", "HIGH SCORE"};
 	lcdPutS(".TETRIS.", lcdTextX(7), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
 	lcdPutS("THE STM32 GAME", lcdTextX(4), lcdTextY(4), decodeRgbValue(15, 31, 0), decodeRgbValue(0, 0, 0));
 	int x = 0;
@@ -1677,7 +1678,8 @@ int goBack(volatile int AD_value, int run){
 }
 
 // Funkcia vypise na obrazovku ABC a umoznuje prepnut medzi nimi
-void drawABC(int abcVolba, char* abc[]){
+void drawABC(int abcVolba){
+	char* abc[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Esc","Del","Ent"};
 	int k = 2;
 	int y = 4;
 	lcdPutS("PICK CHARACTERS", lcdTextX(3), lcdTextY(1), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
@@ -1721,7 +1723,8 @@ int returnAbcVolba(volatile int AD_value, int abcVolba){
 }
 
 // Funkcia vymeni meno hraca alebo vrati naspat do menu
-void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], char abc2[], int *run, char alias[7]){
+void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], int *run, char alias[7]){
+	char abc2[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 	if ((AD_value > 3300) && (AD_value < 3650)){
 		if (abcVolba < 26 && *index < 7){
 			newAlias[*index] = abc2[abcVolba];
@@ -1868,4 +1871,82 @@ void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_
 }
 
 //
+void updateText( int *score, uint16_t matrix[128][128], int *lines, char scoree[7], char line[7], float *t, char time[7], int *apm, char pm[7]){
+	int tempScore = 0;
+	int tt = 0;
+	int tempApm = 0;
+	char tempPm[7];
+	// checkuje naplnene riadky
+	  tempScore = *score;
+	  *score += checkLineFilled(matrix);
+	  *lines += returnLines(tempScore, *score);
+	  // Vypise score
+	  sprintf(scoree, "%d", *score);
+	  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  // Vypise odstranene riadky
+	  sprintf(line, "%d", *lines);
+	  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  // Vypise cas
+	  *t=*t+0.8;
+	  tt=*t;
+	  sprintf(time, "%d", tt);
+	  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	  // Vypise score/min
+	  tempApm = *apm;
+	  *apm = *score/(tt/60);
+	  sprintf(pm, "%d", *apm);
+	  if (tempApm != *apm){
+		  sprintf(tempPm, "%d", tempApm);
+		  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
+	  }
+	  lcdPutS(pm, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+}
 
+void adc_init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStructure;
+  ADC_InitTypeDef ADC_InitStructure;
+  /* Enable GPIO clock */
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  /* Configure ADCx Channel 2 as analog input */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 ;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  /* Enable the HSI oscillator */
+  RCC_HSICmd(ENABLE);
+  /* Check that HSI oscillator is ready */
+  while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+  /* Enable ADC clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  /* Initialize ADC structure */
+  ADC_StructInit(&ADC_InitStructure);
+  /* ADC1 configuration */
+  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  ADC_InitStructure.ADC_NbrOfConversion = 1;
+  ADC_Init(ADC1, &ADC_InitStructure);
+  /* ADCx regular channel8 configuration */
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_96Cycles);
+  /* Enable the ADC */
+  ADC_Cmd(ADC1, ENABLE);
+
+  /* Wait until the ADC1 is ready */
+  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET)
+  {
+  }
+  /* Start ADC Software Conversion */
+  ADC_SoftwareStartConv(ADC1);
+}
+
+void startupNVIC(){
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn; // nam preru�en� n�jdete v s�bore stm32l1xx.h
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}

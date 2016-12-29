@@ -30,69 +30,10 @@
 #include "spi.h"
 #include "ssd1306.h"
 #include "ili9163.h"
-#include <time.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
-
-volatile int AD_value = 0;
-
-void ADC1_IRQHandler(void) {
-	if (ADC1->SR & ADC_SR_EOC) {
-		AD_value = ADC1->DR;
-	}
-}
-
-void adc_init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStructure;
-  ADC_InitTypeDef ADC_InitStructure;
-  /* Enable GPIO clock */
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-  /* Configure ADCx Channel 2 as analog input */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 ;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-  /* Enable the HSI oscillator */
-  RCC_HSICmd(ENABLE);
-  /* Check that HSI oscillator is ready */
-  while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
-  /* Enable ADC clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-  /* Initialize ADC structure */
-  ADC_StructInit(&ADC_InitStructure);
-  /* ADC1 configuration */
-  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
-  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
-  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-  ADC_InitStructure.ADC_NbrOfConversion = 1;
-  ADC_Init(ADC1, &ADC_InitStructure);
-  /* ADCx regular channel8 configuration */
-  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_96Cycles);
-  /* Enable the ADC */
-  ADC_Cmd(ADC1, ENABLE);
-
-  /* Wait until the ADC1 is ready */
-  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET)
-  {
-  }
-  /* Start ADC Software Conversion */
-  ADC_SoftwareStartConv(ADC1);
-}
-
-void startupNVIC(){
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn; // nam preru�en� n�jdete v s�bore stm32l1xx.h
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-}
 
 /* Private typedef */
 /* Private define  */
@@ -631,6 +572,15 @@ unsigned char pic4[]=
 **
 **===========================================================================
 */
+
+volatile int AD_value = 0;
+
+void ADC1_IRQHandler(void) {
+	if (ADC1->SR & ADC_SR_EOC) {
+		AD_value = ADC1->DR;
+	}
+}
+
 int main(void)
 {
 	adc_init();
@@ -640,104 +590,61 @@ int main(void)
 	initCD_Pin();
 	initCS_Pin();
 	initRES_Pin();
-	lcdInitialise(LCD_ORIENTATION0); // inicialiyuje LCD
+	lcdInitialise(LCD_ORIENTATION0); 				// inicialiyuje LCD
 	lcdClearDisplay(decodeRgbValue(0, 0, 0));   	// vycisti obrazovku
 
-  	// Parametre objektu
+  	// Pociatocne parametre
   	uint8_t blockX[1000], blockY[1000], xDir[1000], yDir[1000];
-  	int lines = 0, cc = 0, tt = 0, tempScore = 0, tempApm = 0, apm = 0, run = 0, abcVolba = 0, index = 0, volba = 0, cisloTvaru = 0, count = 0, score = 0;
-  	char time[7], pm[7], scoree[7], line[7], tempPm[7];
-  	uint16_t matrix[128][128];	// matica hry
-  	float t = 0;
-	int highscore[] = {500, 400, 300, 200, 100};
-  	char* names[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
-  	char alias[7] = "Noname";
-  	char* menuVolba[] = {"PLAY GAME", "CHANGE MY NAME", "HIGH SCORE"};
-  	char* abc[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Esc","Del","Ent"};
-  	char abc2[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-  	char newAlias[7] =  "";
-
-  	//vytvorenie objektov
-  	for (int i = 0; i < 1000; i++){
-		blockX[i] = 81; 	// zaciatocna X-ova pozicia objektu
-		blockY[i] = 0; 	// zaciatocna Y-ova pozicia objektu
-		xDir[i] = 6; 	// velkost jedneho kroku na X-ovej osi
-		yDir[i] = 6; 	// velkost jedneho kroku na Y-ovej osi
+  	int odstRiad = 0, rotCheck = 0, ppm = 0, run = 0, abcVolba = 0, nameIndex = 0, volba = 0, cisloTvaru = 0, cisObj = 0, score = 0;
+  	char timeStr[7], ppmStr[7], scoreStr[7], odstRiadStr[7];
+  	uint16_t matrix[128][128];
+  	float time = 0;
+	int hScValues[] = {5000, 4000, 3000, 2000, 1000};
+  	char* hScNames[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
+  	char currName[7] = "Noname", newName[7] =  "";
+  	for (int i = 0; i < 1000; i++){ 		//vytvorenie objektov
+		blockX[i] = 81; blockY[i] = 0; xDir[i] = 6; yDir[i] = 6;
   	}
-  	// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
-  	createFrame(matrix);
+  	createFrame(matrix); 					// vytvorenie ramy a vyplnit vsetko ine na ciernu farbu
+  	cisloTvaru = generateNumber(AD_value); 	// vygenerovanie cislo objektu
 
-	//cisloTvaru = generateNumber(AD_value);
-  	cisloTvaru = generateNumber(AD_value);
   /* Infinite loop */
   while (1)
   {
-	  // Hlavne okno
+	  // Main menu
 	  if (run == 0){
-		  drawMenu(AD_value, volba, menuVolba); 	// vypise texty a umoznuje pohyb medzi volbami
+		  drawMenu(AD_value, volba); 				// vypise texty a umoznuje pohyb medzi volbami
 		  volba = returnVolba(AD_value, volba);		// vrati hodnotu vybranej volby
 		  run = returnRun(AD_value, volba, run);	// vrati volbu dalsieho okna
 	  }
 	  // Play game
 	  else if (run == 1){
-		  // vypise texty na lavu stranu
-		  createText(alias);
-		  // v kazdom kroku aktualizuje maticu
-		  matrixPlot(matrix, cisloTvaru);
-		  // vymaze dany objekt
-		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 0);
-		  // v kazdom kroku posuva objekt smerom dole
-		  blockY[count] += yDir[count];
-		  buttonPressed(AD_value, &xDir[count], matrix, &blockX[count], &blockY[count], &cisloTvaru, &cc);
-		  // checkuje naplnene riadky
-		  tempScore = score;
-		  score += checkLineFilled(matrix);
-		  lines += returnLines(tempScore, score);
-		  // Vypise score
-		  sprintf(scoree, "%d", score);
-		  lcdPutS(scoree, lcdTextX(1), lcdTextY(8), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		  // Vypise odstranene riadky
-		  sprintf(line, "%d", lines);
-		  lcdPutS(line, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		  // Vypise cas
-		  t=t+0.8;
-		  tt=t;
-		  sprintf(time, "%d", tt);
-		  lcdPutS(time, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		  // Vypise score/min
-		  tempApm = apm;
-		  apm = score/tt;
-		  sprintf(pm, "%d", apm);
-		  if (tempApm != apm){
-			  sprintf(tempPm, "%d", tempApm);
-			  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
-		  }
-		  lcdPutS(pm, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
-		  // Checkuje prekazku a Game over
-		  checkObstacleAndGameOver(matrix, &blockX[count], &blockY[count], &cisloTvaru, &yDir[count], &run, &count, AD_value);
-
-		  // vykresli dany objekt
-		  createDeleteBlock(matrix, blockX[count], blockY[count], cisloTvaru, 1);
-		  cc = 0;
+		  createText(currName);						// vypise texty na lavej strane
+		  matrixPlot(matrix, cisloTvaru);			// v kazdom kroku aktualizuje maticu
+		  createDeleteBlock(matrix, blockX[cisObj], blockY[cisObj], cisloTvaru, 0);		// vymaze aktualny objekt
+		  blockY[cisObj] += yDir[cisObj];			// v kazdom kroku posuva objekt smerom dole
+		  buttonPressed(AD_value, &xDir[cisObj], matrix, &blockX[cisObj], &blockY[cisObj], &cisloTvaru, &rotCheck);	// rozhoduje o tom co ma robit, ak gombiky su tlacene
+		  updateText(&score, matrix, &odstRiad, scoreStr, odstRiadStr, &time, timeStr, &ppm, ppmStr);	// aktualizuje hodnoty na lavej strane
+		  checkObstacleAndGameOver(matrix, &blockX[cisObj], &blockY[cisObj], &cisloTvaru, &yDir[cisObj], &run, &cisObj, AD_value);	// Checkuje prekazku a Game over
+		  createDeleteBlock(matrix, blockX[cisObj], blockY[cisObj], cisloTvaru, 1);	// vykresli aktualny objekt
+		  rotCheck = 0;								// zabezpecuje aby rotacia mohla nastat v kazdom cykle iba raz
 	  }
 	  // Change my name
 	  else if (run == 2){
-		  drawABC(abcVolba, abc);
-		  abcVolba = returnAbcVolba(AD_value, abcVolba);
-		  changeName(AD_value, abcVolba, &index, newAlias, abc2, &run, alias);
+		  drawABC(abcVolba); 						// vykresli abc na obrazovke
+		  abcVolba = returnAbcVolba(AD_value, abcVolba);	// umoznuje prechadzanie medzi pismenami
+		  changeName(AD_value, abcVolba, &nameIndex, newName, &run, currName);	// umoznuje vybrat si pismena a nastavit nove meno
 	  }
 	  // High score
 	  else if (run == 3){
-		  showHighscore(highscore, names);
-		  run = goBack(AD_value, run);
+		  showHighscore(hScValues, hScNames);		// vypise High Score s menami
+		  run = goBack(AD_value, run);				// vrati spat na hlavnu stranku
 	  }
 	  // Game over
 	  else if (run == 4){
-		  drawGameOver(scoree, score, highscore, names, alias, time, pm);
-		  clearData(AD_value, &score, &t, &lines, &apm, &run, blockX, blockY, xDir, yDir, &count, matrix);
+		  drawGameOver(scoreStr, score, hScValues, hScNames, currName, timeStr, ppmStr);	// vypise Game over a ziskane vysledky
+		  clearData(AD_value, &score, &time, &odstRiad, &ppm, &run, blockX, blockY, xDir, yDir, &cisObj, matrix);	// resetuje pociatocne parametre
 	  }
   }
-
-
   return 0;
 }
