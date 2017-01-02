@@ -982,8 +982,7 @@ int checkLineFilled(uint16_t matrix[128][128]){
 int checkGameOver(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru){
 	int temp = 0;
 	for (int i = 0; i < 19; i++)
-		if (i != 2)
-			for (int j = 2; j < 10; j++)
+		for (int j = 2; j < 10; j++)
 			if ((cisloTvaru == i) && (y0 - 6)==0 && (matrix[x0][y0 + 1] == j))
 				temp = 1;
 	return temp;
@@ -1013,7 +1012,7 @@ void createText(char alias[7]){
 	lcdPutS("Lines:", lcdTextX(1), lcdTextY(4), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Score:", lcdTextX(1), lcdTextY(7), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 	lcdPutS("Time:", lcdTextX(1), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS("P/M:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS("P/Min:", lcdTextX(1), lcdTextY(13), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
 }
 
 // Funkcia vykonava otocenie objektu
@@ -1694,11 +1693,13 @@ int goBack(volatile int AD_value, int run){
 }
 
 // Funkcia vypise na obrazovku ABC a umoznuje prepnut medzi nimi
-void drawABC(int abcVolba){
+void drawABC(int abcVolba, char alias[7]){
 	char* abc[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","Esc","Del","Ent"};
 	int k = 2;
 	int y = 4;
-	lcdPutS("PICK CHARACTERS", lcdTextX(3), lcdTextY(1), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	lcdPutS("OLD NAME:", lcdTextX(3), lcdTextY(1), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
+	for (int i = 0; i < 7; i++)
+		lcdPutCh(alias[i], lcdTextX(13 + i), lcdTextY(1), decodeRgbValue(31, 31, 0), decodeRgbValue(0, 0, 0));
 	for(int i = 0; i < 29; i++){
 		if (k < 17 && y < 10){
 			k = k + 2;
@@ -1761,12 +1762,12 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 			lcdPutCh(newAlias[*index], lcdTextX(*index + 7), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 			lcdPutS("MAX 7 CHARS!!!", lcdTextX(4), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
 		}
-		else if (abcVolba == 28){
-			for (int i = 0; i < 7; i++)
-				if (newAlias[i] == ' ')
-					alias[i] = ' ';
-				else
-					alias[i] = newAlias[i];
+		else if (abcVolba == 28 && (newAlias[0] != '\0' && newAlias[0] != ' ')){
+			for (int i = 0; i < 7; i++){
+				alias[i] = ' ';
+				alias[i] = newAlias[i];
+				newAlias[i] = ' ';
+			}
 			lcdClearDisplay(decodeRgbValue(0, 0, 0));
 			*index = 0;
 			*run = 0;
@@ -1775,7 +1776,7 @@ void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7
 }
 
 // Funkcia vykresli text na obraze game over
-void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]){
+void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[8]){
 	if (score >= highscore[0]){
 		highscore[0] = score;
 		names[0] = alias;
@@ -1799,23 +1800,29 @@ void drawGameOver(char scoree[7], int score, int highscore[], char* names[], cha
 	lcdPutS("Game Over!", lcdTextX(6), lcdTextY(2), decodeRgbValue(10, 31, 10), decodeRgbValue(0, 0, 0));
 	lcdPutS("Chin up", lcdTextX(4), lcdTextY(6), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
 	lcdPutS(alias, lcdTextX(12), lcdTextY(6), decodeRgbValue(31, 31, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS("Your score :", lcdTextX(2), lcdTextY(8), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS(scoree, lcdTextX(15), lcdTextY(8), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-	lcdPutS("Your time  :", lcdTextX(2), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS(time, lcdTextX(15), lcdTextY(10), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
-	lcdPutS("Your p/m   :", lcdTextX(2), lcdTextY(12), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
-	lcdPutS(pm, lcdTextX(15), lcdTextY(12), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("Score :", lcdTextX(4), lcdTextY(8), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(scoree, lcdTextX(12), lcdTextY(8), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("Time  :", lcdTextX(4), lcdTextY(10), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	lcdPutS(time, lcdTextX(12), lcdTextY(10), decodeRgbValue(31, 31, 31), decodeRgbValue(0, 0, 0));
+	lcdPutS("P/min :", lcdTextX(4), lcdTextY(12), decodeRgbValue(31, 0, 0), decodeRgbValue(0, 0, 0));
+	for (int i = 0; i < 8; i++)
+		lcdPutCh(pm[i], lcdTextX(12 + i), lcdTextY(12), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 	lcdPutS("BACK", lcdTextX(1), lcdTextY(15), decodeRgbValue(255, 255, 255), decodeRgbValue(31, 0, 0));
 }
 
 // Funkcia resetuje parametre pre novu hru
-void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, int *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]){
+void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, float *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128], char ppmStr[8]){
 	if ((AD_value > 1700) && (AD_value < 3650)){
 		lcdClearDisplay(decodeRgbValue(0, 0, 0));
 		*score = 0;
 		*time = 0;
 		*odstRiad = 0;
 		*ppm = 0;
+		for (int i = 0; i < 8; i++)
+			if (i == 0)
+				ppmStr[i] = '0';
+			else
+				ppmStr[i] = ' ';
 		*run = 0;
 		for (int i = 0; i < 1000; i++){
 			blockX[i] = 81; blockY[i] = 0; xDir[i] = 6; yDir[i] = 6;
@@ -1884,11 +1891,8 @@ void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_
 }
 
 // Funkcia aktualizuje hodnoty textov na lavej strane pocas hry
-void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], int *ppm, char ppmStr[7]){
-	int tempScore = 0;
-	int timeInt = 0;
-	int tempApm = 0;
-	char tempPm[7];
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[8]){
+	int tempScore = 0, timeInt = 0;
 
 	// checkuje naplnene riadky
 	tempScore = *score;
@@ -1910,16 +1914,104 @@ void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scor
 	lcdPutS(timeStr, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 	// Vypise score/min
-	tempApm = *ppm;
-	*ppm = *score/(timeInt/60);
-	sprintf(ppmStr, "%d", *ppm);
-	if (tempApm != *ppm){
-	  sprintf(tempPm, "%d", tempApm);
-	  lcdPutS(tempPm, lcdTextX(1), lcdTextY(14), decodeRgbValue(0, 0, 0), decodeRgbValue(0, 0, 0));
-	}
-	lcdPutS(ppmStr, lcdTextX(1), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
+	*ppm = *score/(*time/60);
+	convertFloatToChar(*ppm, ppmStr);
+	for (int i = 0; i < 8; i++)
+		lcdPutCh(ppmStr[i], lcdTextX(1 + i), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
+void convertFloatToChar(float cis, char text[8]){
+	int c1, c2, c3, c4, c5, d, temp, number = cis;
+	if (number < 1){
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = '0';
+		text[1] = '.';
+		text[2] = d + '0';
+		text[3] = ' ';
+		text[4] = ' ';
+		text[5] = ' ';
+		text[6] = ' ';
+		text[7] = ' ';
+	}
+	else if (number >= 1 && number < 10){
+		c1 = cis;
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = c1 + '0';
+		text[1] = '.';
+		text[2] = d + '0';
+		text[3] = ' ';
+		text[4] = ' ';
+		text[5] = ' ';
+		text[6] = ' ';
+		text[7] = ' ';
+	}
+	else if (number >= 10 && number < 100){
+		c1 = cis/10;
+		c2 = cis-(10*c1);
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = c1 + '0';
+		text[1] = c2 + '0';
+		text[2] = '.';
+		text[3] = d + '0';
+		text[4] = ' ';
+		text[5] = ' ';
+		text[6] = ' ';
+		text[7] = ' ';
+	}
+	else if (number >= 100 && number < 1000){
+		c1 = cis/100;
+		c2 = (cis-(100*c1))/10;
+		c3 = cis-(100*c1 + c2*10);
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = c1 + '0';
+		text[1] = c2 + '0';
+		text[2] = c3 + '0';
+		text[3] = '.';
+		text[4] = d + '0';
+		text[5] = ' ';
+		text[6] = ' ';
+		text[7] = ' ';
+	}
+	else if (number >= 1000 && number < 10000){
+		c1 = cis/1000;
+		c2 = (cis-(1000*c1))/100;
+		c3 = (cis-(1000*c1 + c2*100))/10;
+		c4 = (cis-(1000*c1 + c2*100 + c3*10));
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = c1 + '0';
+		text[1] = c2 + '0';
+		text[2] = c3 + '0';
+		text[3] = c4 + '0';
+		text[4] = '.';
+		text[5] = d + '0';
+		text[6] = ' ';
+		text[7] = ' ';
+	}
+	else if  (number >= 10000 && number < 100000){
+		c1 = cis/10000;
+		c2 = (cis-(10000*c1))/1000;
+		c3 = (cis-(10000*c1 + c2*1000))/100;
+		c4 = (cis-(10000*c1 + c2*1000 + c3*100))/10;
+		c5 = (cis-(10000*c1 + c2*1000 + c3*100 + c4*10));
+		temp = cis;
+		d = (cis * 10) - (temp * 10);
+		text[0] = c1 + '0';
+		text[1] = c2 + '0';
+		text[2] = c3 + '0';
+		text[3] = c4 + '0';
+		text[4] = c5 + '0';
+		text[5] = '.';
+		text[6] = d + '0';
+		text[7] = ' ';
+	}
+	else if  (number >= 100000)
+		text = "99999.9";
+}
 
 
 

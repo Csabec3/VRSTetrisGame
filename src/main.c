@@ -595,13 +595,13 @@ int main(void)
 
   	// Pociatocne parametre
   	uint8_t blockX[1000], blockY[1000], xDir[1000], yDir[1000];
-  	int odstRiad = 0, rotCheck = 0, ppm = 0, run = 0, abcVolba = 0, nameIndex = 0, volba = 0, cisloTvaru = 0, cisObj = 0, score = 0;
-  	char timeStr[7], ppmStr[7], scoreStr[7], odstRiadStr[7];
+  	int odstRiad = 0, rotCheck = 0, run = 0, abcVolba = 0, nameIndex = 0, volba = 0, cisloTvaru = 0, cisObj = 0, score = 0;
+  	char timeStr[7], ppmStr[8] = "0      ", scoreStr[7], odstRiadStr[7];
   	uint16_t matrix[128][128];
-  	float time = 0;
+  	float time = 0, ppm = 0;
 	int hScValues[] = {5000, 4000, 3000, 2000, 1000};
   	char* hScNames[] = { "Player1", "Player2" , "Player3", "Player4", "Player5"};
-  	char currName[7] = "Noname", newName[7] =  "";
+  	char currName[7] = "NONAME", newName[7] =  "";
   	for (int i = 0; i < 1000; i++){ 		//vytvorenie objektov
 		blockX[i] = 81; blockY[i] = 0; xDir[i] = 6; yDir[i] = 6;
   	}
@@ -631,7 +631,7 @@ int main(void)
 	  }
 	  // Change my name
 	  else if (run == 2){
-		  drawABC(abcVolba); 						// vykresli abc na obrazovke
+		  drawABC(abcVolba, currName); 						// vykresli abc na obrazovke
 		  abcVolba = returnAbcVolba(AD_value, abcVolba);	// umoznuje prechadzanie medzi pismenami
 		  changeName(AD_value, abcVolba, &nameIndex, newName, &run, currName);	// umoznuje vybrat si pismena a nastavit nove meno
 	  }
@@ -643,7 +643,7 @@ int main(void)
 	  // Game over
 	  else if (run == 4){
 		  drawGameOver(scoreStr, score, hScValues, hScNames, currName, timeStr, ppmStr);	// vypise Game over a ziskane vysledky
-		  clearData(AD_value, &score, &time, &odstRiad, &ppm, &run, blockX, blockY, xDir, yDir, &cisObj, matrix);	// resetuje pociatocne parametre
+		  clearData(AD_value, &score, &time, &odstRiad, &ppm, &run, blockX, blockY, xDir, yDir, &cisObj, matrix, ppmStr);	// resetuje pociatocne parametre
 	  }
   }
   return 0;

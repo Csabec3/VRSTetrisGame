@@ -152,6 +152,7 @@ void lcdPutCh(unsigned char character, uint8_t x, uint8_t y, uint16_t fgColour, 
 void lcdPutS(const char *string, uint8_t x, uint8_t y, uint16_t fgColour, uint16_t bgColour);
 void createText(char alias[7]);
 void createFrame(uint16_t matrix[128][128]);
+void convertFloatToChar(float number, char text[8]);
 
 // funkcie hlavneho okna
 void drawMenu(volatile int AD_value, int volba);
@@ -163,18 +164,18 @@ void showHighscore(int highscore[], char* names[]);
 int goBack(volatile int AD_value, int run);
 
 // funkcie okna change my name
-void drawABC(int abcVolba);
+void drawABC(int abcVolba, char alias[7]);
 int returnAbcVolba(volatile int AD_value, int abcVolba);
 void changeName(volatile int AD_value, int abcVolba, int *index, char newAlias[7], int *run, char alias[7]);
 
 // funkcie okna game over
 void drawGameOver(char scoree[7], int score, int highscore[], char* names[], char alias[7], char time[7], char pm[7]);
-void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, int *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128]);
+void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, float *ppm, int *run, uint8_t blockX[1000], uint8_t blockY[1000], uint8_t xDir[1000], uint8_t yDir[1000], int *count, uint16_t matrix[128][128], char ppmStr[8]);
 
 // funkcie pre Tetris
 void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *rotCheck);
 void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *cisObj, volatile int AD_value);
-void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], int *ppm, char ppmStr[7]);
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[7]);
 void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
 void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int rotateObject(int cisloTvaru);
