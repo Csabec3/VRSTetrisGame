@@ -31,7 +31,6 @@
 #include "ssd1306.h"
 #include "ili9163.h"
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -573,6 +572,15 @@ unsigned char pic4[]=
 **===========================================================================
 */
 
+int gTimeStamp = 0;
+
+void TIM2_IRQHandler(void){
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET){
+		gTimeStamp++;
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
+}
+
 volatile int AD_value = 0;
 
 void ADC1_IRQHandler(void) {
@@ -585,6 +593,7 @@ int main(void)
 {
 	adc_init();
 	startupNVIC();
+	initBaseTimer();
 	ADC_ITConfig(ADC1, ADC_IT_EOC, ENABLE);
 	initSPI2();
 	initCD_Pin();
@@ -616,6 +625,8 @@ int main(void)
 		  drawMenu(AD_value, volba); 				// vypise texty a umoznuje pohyb medzi volbami
 		  volba = returnVolba(AD_value, volba);		// vrati hodnotu vybranej volby
 		  run = returnRun(AD_value, volba, run);	// vrati volbu dalsieho okna
+		  if (run == 1)
+			  gTimeStamp = 0;
 	  }
 	  // Play game
 	  else if (run == 1){
@@ -624,7 +635,7 @@ int main(void)
 		  createDeleteBlock(matrix, blockX[cisObj], blockY[cisObj], cisloTvaru, 0);		// vymaze aktualny objekt
 		  blockY[cisObj] += yDir[cisObj];			// v kazdom kroku posuva objekt smerom dole
 		  buttonPressed(AD_value, &xDir[cisObj], matrix, &blockX[cisObj], &blockY[cisObj], &cisloTvaru, &rotCheck);	// rozhoduje o tom co ma robit, ak gombiky su tlacene
-		  updateText(&score, matrix, &odstRiad, scoreStr, odstRiadStr, &time, timeStr, &ppm, ppmStr);	// aktualizuje hodnoty na lavej strane
+		  updateText(&score, matrix, &odstRiad, scoreStr, odstRiadStr, &time, timeStr, &ppm, ppmStr, gTimeStamp);	// aktualizuje hodnoty na lavej strane
 		  checkObstacleAndGameOver(matrix, &blockX[cisObj], &blockY[cisObj], &cisloTvaru, &yDir[cisObj], &run, &cisObj, AD_value);	// Checkuje prekazku a Game over
 		  createDeleteBlock(matrix, blockX[cisObj], blockY[cisObj], cisloTvaru, 1);	// vykresli aktualny objekt
 		  rotCheck = 0;								// zabezpecuje aby rotacia mohla nastat v kazdom cykle iba raz

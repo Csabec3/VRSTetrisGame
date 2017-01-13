@@ -1891,7 +1891,7 @@ void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_
 }
 
 // Funkcia aktualizuje hodnoty textov na lavej strane pocas hry
-void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[8]){
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[8], int gTimeStamp){
 	int tempScore = 0, timeInt = 0;
 
 	// checkuje naplnene riadky
@@ -1908,7 +1908,7 @@ void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scor
 	lcdPutS(odstRiadStr, lcdTextX(1), lcdTextY(5), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 
 	// Vypise cas
-	*time = *time + 0.8;
+	*time = gTimeStamp;
 	timeInt = *time;
 	sprintf(timeStr, "%d", timeInt);
 	lcdPutS(timeStr, lcdTextX(1), lcdTextY(11), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
@@ -1920,6 +1920,7 @@ void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scor
 		lcdPutCh(ppmStr[i], lcdTextX(1 + i), lcdTextY(14), decodeRgbValue(255, 255, 255), decodeRgbValue(0, 0, 0));
 }
 
+// Funkcia na konvertovanie float hodnoty na integer
 void convertFloatToChar(float cis, char text[8]){
 	int c1, c2, c3, c4, c5, d, temp, number = cis;
 	if (number < 1){
@@ -2011,6 +2012,31 @@ void convertFloatToChar(float cis, char text[8]){
 	}
 	else if  (number >= 100000)
 		text = "99999.9";
+}
+
+// Funkcia ktorá inicializuje údaje pre èasovaè
+void initBaseTimer(){
+	unsigned short prescalerValue = (unsigned short) (SystemCoreClock / 1000) - 1;
+	/*Structure for timer settings*/
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+	/* TIM2 clock enable */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	/* Enable the TIM3 gloabal Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	TIM_TimeBaseStructure.TIM_Period = 500;
+	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseStructure.TIM_Prescaler = prescalerValue;
+	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+	/* TIM Interrupts enable */
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	/* TIM2 enable counter */
+	TIM_Cmd(TIM2, ENABLE);
 }
 
 

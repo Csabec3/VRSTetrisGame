@@ -134,9 +134,10 @@ uint8_t lcdTextX(uint8_t x);
 // it easy to place text
 uint8_t lcdTextY(uint8_t y);
 
-// Funkcie potrebne na prerusenia
+// Funkcie potrebne na prerusenia a na casovac
 void startupNVIC();
 void adc_init(void);
+void initBaseTimer();
 
 //	LCD function prototypes
 void lcdReset(void);
@@ -175,7 +176,7 @@ void clearData(volatile int AD_value, int *score, float *time, int *odstRiad, fl
 // funkcie pre Tetris
 void buttonPressed(volatile int AD_value, uint8_t *xDir, uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, int *rotCheck);
 void checkObstacleAndGameOver(uint16_t matrix[128][128], uint8_t *blockX, uint8_t *blockY, int *cisloTvaru, uint8_t *yDir, int *run, int *cisObj, volatile int AD_value);
-void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[7]);
+void updateText( int *score, uint16_t matrix[128][128], int *odstRiad, char scoreStr[7], char odstRiadStr[7], float *time, char timeStr[7], float *ppm, char ppmStr[7], int gTimeStamp);
 void createDeleteBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru, int volba);
 void placeDownBlock(uint16_t matrix[128][128], int16_t x0, int16_t y0, int cisloTvaru);
 int rotateObject(int cisloTvaru);
